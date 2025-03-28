@@ -1,12 +1,18 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, verificarPosicaoTabuleiro/4, moverPeca/7]).
 
-% Cria o tabuleiro 4x4 com o unicode de um quadrado em cada casa
 criarTabuleiro(Tabuleiro) :-
+    /* Cria o tabuleiro já colocando os jogadores nas extremidades. 
+    
+    Args: 
+        Tabuleiro: tabuleiro a ser criado. 
+
+    Returns: o tabuleiro gerado.
+    */
     Tabuleiro = [
+        ['\x26AA', '\x1F533', '\x1F533', '\x1F533'],
         ['\x1F533', '\x1F533', '\x1F533', '\x1F533'],
         ['\x1F533', '\x1F533', '\x1F533', '\x1F533'],
-        ['\x1F533', '\x1F533', '\x1F533', '\x1F533'],
-        ['\x1F533', '\x1F533', '\x1F533', '\x1F533']
+        ['\x1F533', '\x1F533', '\x1F533', '\x26AB']
     ].
 
 
@@ -54,5 +60,48 @@ iniciarTabuleiros(Tab1, Tab2, Tab3) :-
     criarTabuleiro(Tab1),
     criarTabuleiro(Tab2),
     criarTabuleiro(Tab3).
+
+
+verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, PecaEsperada) :-
+    /* Verifica se a peça correta está na posição escolhida.
+        
+    Args:
+        Tabuleiro: o tabuleiro atual.
+        Linha: linha escolhida pelo jogador.
+        Coluna: coluna escolhida pelo jogador.
+        PecaEsperada: a peça que o jogador deve selecionar.
+        
+    Returns:
+        true se a posição for válida, false caso contrário.
+    */
+    nth1(Linha, Tabuleiro, LinhaLista), % Obtém a linha
+    nth1(Coluna, LinhaLista, Peca), % Obtém a peça na posição escolhida
+    Peca == PecaEsperada. % Retorna true se a peça for a esperada, false caso contrário
+
+moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
+    /* Move a Peca com base na linha e a coluna.
+
+    Args: 
+        TabuleiroAntigo: tabuleiro original que vai ser atualizado. 
+        LinhaOrigem: linha onde a peca estava anteriormente. 
+        ColunaOrigem: coluna onde a peça estava anteriormente. 
+        LinhaDestino: linha de destino da peça. 
+        ColunaDestino: coluna de destino da peça. 
+        Peca: peça do jogador atual em questão. 
     
-    
+    Returns: 
+        TabuleiroAtualizado: tabuleiro depois que a peça se moveu.
+    */
+    nth1(LinhaOrigem, TabuleiroAntigo, LinhaOrigemLista),
+    replace(ColunaOrigem, LinhaOrigemLista, '\x1F533', NovaLinhaOrigem),
+    replace(LinhaOrigem, TabuleiroAntigo, NovaLinhaOrigem, TabuleiroIntermediario),
+    nth1(LinhaDestino, TabuleiroIntermediario, LinhaDestinoLista),
+    replace(ColunaDestino, LinhaDestinoLista, Peca, NovaLinhaDestino),
+    replace(LinhaDestino, TabuleiroIntermediario, NovaLinhaDestino, TabuleiroAtualizado).
+
+replace(Index, List, NewElement, NewList) :-
+    /* Troca os elementos.
+    */ 
+    nth1(Index, List, _, Rest),
+    nth1(Index, NewList, NewElement, Rest).
+
