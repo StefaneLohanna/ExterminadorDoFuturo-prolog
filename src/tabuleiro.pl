@@ -1,4 +1,16 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5, verificarPosicaoTabuleiro/4, moverPeca/7]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7]).
+
+%  Definindo os emojis dos jogadores
+espacoVazio('\x1F533'). 
+jogador1('\x26AA').
+jogador2('\x26AB').
+semente('\x1F330').
+arbusto('\x1F331').
+arvore('\x1F333').
+caveira('\x1F480').
+negado('\x274C').
+exclamacao('\x2757').
+
 
 criarTabuleiro(Tabuleiro) :-
     /* Cria o tabuleiro já colocando os jogadores nas extremidades. 
@@ -8,13 +20,15 @@ criarTabuleiro(Tabuleiro) :-
 
     Returns: o tabuleiro gerado.
     */
+    espacoVazio(Ev),
+    jogador1(J1),
+    jogador2(J2),
     Tabuleiro = [
-        ['\x26AA', '\x1F533', '\x1F533', '\x1F533'],
-        ['\x1F533', '\x1F533', '\x1F533', '\x1F533'],
-        ['\x1F533', '\x1F533', '\x1F533', '\x1F533'],
-        ['\x1F533', '\x1F533', '\x1F533', '\x26AB']
+        [J1, Ev, Ev, Ev],
+        [Ev, Ev, Ev, Ev],
+        [Ev, Ev, Ev, Ev],
+        [Ev, Ev, Ev, J2]
     ].
-
 
 exibirTabuleiros(Tab1, Tab2, Tab3) :-
     /* Exibe os três tabuleiros lado a lado.
@@ -80,7 +94,7 @@ modificar_linha(C, [Elem|Resto], NovoValor, [Elem|NovoResto]) :-
     C > 1,
     C1 is C - 1,
     modificar_linha(C1, Resto, NovoValor, NovoResto).
-    
+
 
 verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, PecaEsperada) :-
     /* Verifica se a peça correta está na posição escolhida.
@@ -112,8 +126,9 @@ moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestin
     Returns: 
         TabuleiroAtualizado: tabuleiro depois que a peça se moveu.
     */
+    espacoVazio(Ev),
     nth1(LinhaOrigem, TabuleiroAntigo, LinhaOrigemLista),
-    replace(ColunaOrigem, LinhaOrigemLista, '\x1F533', NovaLinhaOrigem),
+    replace(ColunaOrigem, LinhaOrigemLista, Ev, NovaLinhaOrigem),
     replace(LinhaOrigem, TabuleiroAntigo, NovaLinhaOrigem, TabuleiroIntermediario),
     nth1(LinhaDestino, TabuleiroIntermediario, LinhaDestinoLista),
     replace(ColunaDestino, LinhaDestinoLista, Peca, NovaLinhaDestino),
