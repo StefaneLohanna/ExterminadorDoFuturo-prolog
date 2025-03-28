@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, verificarPosicaoTabuleiro/4, moverPeca/7]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5, verificarPosicaoTabuleiro/4, moverPeca/7]).
 
 criarTabuleiro(Tabuleiro) :-
     /* Cria o tabuleiro já colocando os jogadores nas extremidades. 
@@ -61,6 +61,26 @@ iniciarTabuleiros(Tab1, Tab2, Tab3) :-
     criarTabuleiro(Tab2),
     criarTabuleiro(Tab3).
 
+    % Coloca uma planta em determinada posição do tabuleiro
+plantar(Tabuleiro, Planta, Linha, Coluna, NovoTabuleiro) :-
+    modificar_matriz(Linha, Coluna, Tabuleiro, Planta, NovoTabuleiro).
+
+% Modifica uma posição na matriz
+modificar_matriz(1, C, [Linha|Resto], NovoValor, [NovaLinha|Resto]) :-
+    modificar_linha(C, Linha, NovoValor, NovaLinha).
+
+modificar_matriz(L, C, [Linha|Resto], NovoValor, [Linha|NovoResto]) :-
+    L > 1,
+    L1 is L - 1,
+    modificar_matriz(L1, C, Resto, NovoValor, NovoResto).
+
+% Modifica uma posição na linha
+modificar_linha(1, [_|Resto], NovoValor, [NovoValor|Resto]).
+modificar_linha(C, [Elem|Resto], NovoValor, [Elem|NovoResto]) :-
+    C > 1,
+    C1 is C - 1,
+    modificar_linha(C1, Resto, NovoValor, NovoResto).
+    
 
 verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, PecaEsperada) :-
     /* Verifica se a peça correta está na posição escolhida.
@@ -104,4 +124,3 @@ replace(Index, List, NewElement, NewList) :-
     */ 
     nth1(Index, List, _, Rest),
     nth1(Index, NewList, NewElement, Rest).
-

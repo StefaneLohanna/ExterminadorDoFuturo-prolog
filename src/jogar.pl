@@ -1,5 +1,7 @@
+% File: jogar.pl
 :- module(jogar, [iniciarJogo/0]).
 :- use_module(tabuleiro, [iniciarTabuleiros/3, exibirTabuleiros/3]).
+:- use_module(controllerPlantas, [plantarSemente/9]).  % Import the 9-arity version
 :- use_module(movimento, [movimento/6]).
 
 iniciarJogo :-
