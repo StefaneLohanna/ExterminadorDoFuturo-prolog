@@ -1,5 +1,5 @@
 :- module(movimento, [movimento/6]).
-:- use_module(tabuleiro, [verificarPosicaoTabuleiro/4, moverPeca/7, exibirTabuleiros/3]).
+:- use_module(tabuleiro, [verificarPosicaoTabuleiro/4, moverPeca/7, exibirTabuleiros/3, semente/1, arbusto/1, arvore/1]).
 
 movimento(Foco, Passado, Presente, Futuro, PecaEsperada, TabuleiroAtualizado) :-
     /* Efetua o movimento do jogador. 

@@ -13,7 +13,6 @@
 
     exibirTabuleiros(NovoPassado, NovoPresente, NovoFuturo).*/
 
-
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
     */
@@ -42,6 +41,7 @@ rodada(Peca, Foco, Passado, Presente, Futuro) :-
     writeln("Mudando para o próximo jogador."),
     rodada(NovoPeca, Foco, NovoPassado2, NovoPresente2, NovoFuturo2).
 
+
 jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo) :-
     /* Pede pro jogador escolher a jogada que quer realizar e chama as funções correspondentes a ela. 
 
@@ -64,16 +64,19 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
     writeln("(v) Viajar no tempo"),
     write("Digite sua escolha: "),
     read(Escolha),
-    ( Escolha == m -> 
+    ( Escolha == 'm' -> 
         movimento(Foco, Passado, Presente, Futuro, Jogador, NovoTabuleiro),
         ( Foco == passado -> (NovoPassado = NovoTabuleiro, NovoPresente = Presente, NovoFuturo = Futuro)
         ; Foco == presente -> (NovoPassado = Passado, NovoPresente = NovoTabuleiro, NovoFuturo = Futuro)
         ; Foco == futuro -> (NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = NovoTabuleiro)
         )
-    ; Escolha == p -> 
-        writeln("Jogada 'Plantar' ainda não implementada."),
-        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
-    ; Escolha == v -> 
+    ; Escolha == 'p' -> 
+        writeln("Digite a linha: "),
+        read(Linha),
+        writeln("Digite a coluna: "),
+        read(Coluna),
+        plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo)
+    ; Escolha == 'v' -> 
         writeln("Jogada 'Viajar no tempo' ainda não implementada."),
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ; 

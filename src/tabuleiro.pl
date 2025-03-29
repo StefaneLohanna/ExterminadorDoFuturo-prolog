@@ -112,8 +112,32 @@ verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, PecaEsperada) :-
     nth1(Coluna, LinhaLista, Peca), % Obtém a peça na posição escolhida
     Peca == PecaEsperada. % Retorna true se a peça for a esperada, false caso contrário
 
+
+replace(Index, List, NewElement, NewList) :-
+    /* Troca os elementos.
+    */ 
+    nth1(Index, List, _, Rest),
+    nth1(Index, NewList, NewElement, Rest).
+
+
 moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
-    /* Move a Peca com base na linha e a coluna.
+    /*Move a Peca com base na linha e a coluna.
+    Se a posição destino já estiver ocupada por outra peça, essa peça será movida para uma casa adjacente.
+    */
+    espacoVazio(Ev),
+    nth1(LinhaDestino, TabuleiroAntigo, LinhaDestinoLista),
+    nth1(ColunaDestino, LinhaDestinoLista, ConteudoDestino),
+
+    ( ConteudoDestino == Ev ->  
+        % Se a posição destino está vazia, movemos normalmente.
+        mover_simples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
+    ; 
+        % Caso contrário, empurramos a peça ocupante.
+        empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
+    ).
+
+mover_simples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
+   /* Move a Peca com base na linha e a coluna.
 
     Args: 
         TabuleiroAntigo: tabuleiro original que vai ser atualizado. 
@@ -134,8 +158,49 @@ moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestin
     replace(ColunaDestino, LinhaDestinoLista, Peca, NovaLinhaDestino),
     replace(LinhaDestino, TabuleiroIntermediario, NovaLinhaDestino, TabuleiroAtualizado).
 
-replace(Index, List, NewElement, NewList) :-
-    /* Troca os elementos.
-    */ 
-    nth1(Index, List, _, Rest),
-    nth1(Index, NewList, NewElement, Rest).
+
+empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
+    /* Empurra a peça ocupante para uma casa adjacente e move o jogador para a posição destino. */
+    espacoVazio(Ev),
+    nth1(LinhaDestino, TabuleiroAntigo, LinhaDestinoLista),
+    nth1(ColunaDestino, LinhaDestinoLista, PecaOcupante),  % Pegamos a peça ocupante
+
+    % Determinar a direção do movimento
+    DirecaoLinha is LinhaDestino - LinhaOrigem,
+    DirecaoColuna is ColunaDestino - ColunaOrigem,
+    NovaLinhaOcupante is LinhaDestino + DirecaoLinha,
+    NovaColunaOcupante is ColunaDestino + DirecaoColuna,
+
+    % Verificar se a nova posição está dentro dos limites do tabuleiro
+    length(TabuleiroAntigo, NumLinhas),
+    nth1(1, TabuleiroAntigo, PrimeiraLinha),
+    length(PrimeiraLinha, NumColunas),
+
+    (   
+        % Jogador ocupante será empurrado para fora do tabuleiro
+        (NovaLinhaOcupante < 1 ; NovaLinhaOcupante > NumLinhas ; 
+         NovaColunaOcupante < 1 ; NovaColunaOcupante > NumColunas) ->
+        writeln("Jogador morreu!"),
+        remover_peca(TabuleiroAntigo, LinhaDestino, ColunaDestino, TabuleiroIntermediario),
+        mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
+    ;
+        % Se a nova posição está dentro dos limites
+        nth1(NovaLinhaOcupante, TabuleiroAntigo, NovaLinhaLista),
+        nth1(NovaColunaOcupante, NovaLinhaLista, ProximoConteudo),
+        
+        ( ProximoConteudo \= Ev ->  
+            % Se a próxima casa também estiver ocupada (empurrão em cadeia)
+            empurrar(TabuleiroAntigo, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, PecaOcupante, NovoTabuleiro),
+            mover_simples(NovoTabuleiro, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
+        ; 
+            % Se a próxima casa está vazia, empurra a peça ocupante normalmente
+            mover_simples(TabuleiroAntigo, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, PecaOcupante, TabuleiroIntermediario),
+            mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
+        )
+    ).
+
+remover_peca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado) :-
+    espacoVazio(Ev),
+    nth1(Linha, Tabuleiro, LinhaLista),
+    replace(Coluna, LinhaLista, Ev, NovaLinha),
+    replace(Linha, Tabuleiro, NovaLinha, TabuleiroAtualizado).
