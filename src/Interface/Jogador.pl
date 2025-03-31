@@ -1,6 +1,6 @@
 :- module(jogador, [definirFoco/6]).
 
-:- use_module('./src/Jogo/tabuleiro.pl').
+:- use_module('./src/Jogo/Tabuleiro.pl').
 
 /*
  * Define o foco do jogador para a próxima rodada.

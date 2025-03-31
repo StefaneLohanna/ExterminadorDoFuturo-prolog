@@ -1,9 +1,9 @@
 % File: jogar.pl
-:- module(Jogar, [iniciarJogo/0]).
+:- module(jogar, [iniciarJogo/0]).
 
-:- use_module('./src/Jogo/tabuleiro.pl').
-:- use_module('./src/Jogo/movimento.pl').
-:- use_module('./src/Jogo/controllerPlantas.pl').
+:- use_module('./src/Jogo/Tabuleiro.pl').
+:- use_module('./src/Jogo/Movimento.pl').
+:- use_module('./src/Jogo/ControllerPlantas.pl').
 :- use_module('./src/Interface/Jogador.pl').
 
   /*iniciarJogo :-
