@@ -1,7 +1,7 @@
 % File: controllerPlantas.pl
 
 % Módulo responsável pelo controle do plantio de sementes em diferentes períodos de tempo
-:- module(controllerPlantas, [plantarSemente/9]). % Exporta corretamente o predicado de aridade 9
+:- module(ControllerPlantas, [plantarSemente/9]). % Exporta corretamente o predicado de aridade 9
 
 % Importa o módulo tabuleiro e a função plantar/5, que modifica o estado do tabuleiro
 :- use_module('./src/Jogo/tabuleiro.pl').
