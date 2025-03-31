@@ -1,5 +1,5 @@
 % File: jogar.pl
-:- module(jogar, [iniciarJogo/0]).
+:- module(Jogar, [iniciarJogo/0]).
 
 :- use_module('./src/Jogo/tabuleiro.pl').
 :- use_module('./src/Jogo/movimento.pl').
