@@ -1,8 +1,10 @@
 % File: jogar.pl
 :- module(jogar, [iniciarJogo/0]).
-:- use_module(tabuleiro, [iniciarTabuleiros/3, exibirTabuleiros/3,jogador1/1, jogador2/1]).
-:- use_module(controllerPlantas, [plantarSemente/9]).  % Import the 9-arity version
-:- use_module(movimento, [movimento/6]).
+
+:- use_module('./src/Jogo/tabuleiro.pl').
+:- use_module('./src/Jogo/movimento.pl').
+:- use_module('./src/Jogo/controllerPlantas.pl').
+:- use_module('./src/Interface/Jogador.pl').
 
   /*iniciarJogo :-
     iniciarTabuleiros(Passado, Presente, Futuro),
@@ -18,29 +20,45 @@ iniciarJogo :-
     */
     jogador1(J1),
     iniciarTabuleiros(Passado, Presente, Futuro),
-    rodada(J1, passado, Passado, Presente, Futuro).
+    rodada(J1, passado, futuro, Passado, Presente, Futuro).
 
-rodada(Peca, Foco, Passado, Presente, Futuro) :-
-    /* Faz a rodada chamando jogar duas vezes para o mesmo jogador e depois trocando o jogador atual.
-
-    Args: 
-        Peca: peça do jogador atual. 
-        Foco: foco do jogador atual. 
-        Passado: tabuleiro do passado. 
-        Presente: tabuleiro do presente.
-        Futuro: tabuleiro do futuro. 
-
-    Returns: chama recursivamente passando os tabuleiros atualizados.  
-    */
+/*
+ * Controla a rodada do jogo, permitindo que cada jogador realize duas jogadas antes de alternar.
+ *
+ * @param Peca       Peça do jogador atual.
+ * @param FocoJ1     Foco do jogador 1.
+ * @param FocoJ2     Foco do jogador 2.
+ * @param Passado    O tabuleiro representando o estado atual do passado.
+ * @param Presente   O tabuleiro representando o estado atual do presente.
+ * @param Futuro     O tabuleiro representando o estado atual do futuro.
+ */
+rodada(Peca, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
     jogador1(J1),
     jogador2(J2),
     format("Vez do jogador: ~w~n", [Peca]),
-    jogar(Foco, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1),
-    jogar(Foco, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2),
-    ( Peca == J1 -> NovoPeca = J2 ; NovoPeca = J1 ),
-    writeln("Mudando para o próximo jogador."),
-    rodada(NovoPeca, Foco, NovoPassado2, NovoPresente2, NovoFuturo2).
 
+    % Determina qual foco usar nesta rodada
+    (Peca == J1 -> FocoAtual = FocoJ1 ; FocoAtual = FocoJ2),
+
+    jogar(FocoAtual, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1),
+    jogar(FocoAtual, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2),
+    
+    exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
+    
+    % Define o foco para a próxima rodada
+    (
+        Peca == J1 -> 
+        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, FocoAtual, NovoFocoJ1),
+        NovoFocoJ2 = FocoJ2,
+        NovaPeca = J2
+        ;
+        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, FocoAtual, NovoFocoJ2),
+        NovoFocoJ1 = FocoJ1,
+        NovaPeca = J1
+    ),
+    writeln("Mudando para o próximo jogador."),
+    % Alterna para o outro jogador (mantendo os focos atualizados)
+    rodada(NovaPeca, NovoFocoJ1, NovoFocoJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
 
 jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo) :-
     /* Pede pro jogador escolher a jogada que quer realizar e chama as funções correspondentes a ela. 

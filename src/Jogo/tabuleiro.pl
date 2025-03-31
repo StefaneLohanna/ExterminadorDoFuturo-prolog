@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2]).
 
 %  Definindo os emojis dos jogadores
 espacoVazio('\x1F533'). 
@@ -11,15 +11,13 @@ caveira('\x1F480').
 negado('\x274C').
 exclamacao('\x2757').
 
-
+/*
+ * Cria o tabuleiro já posicionando os jogadores nas extremidades.
+ *
+ * @param Tabuleiro tabuleiro a ser criado.
+ * @return          O tabuleiro gerado.
+ */
 criarTabuleiro(Tabuleiro) :-
-    /* Cria o tabuleiro já colocando os jogadores nas extremidades. 
-    
-    Args: 
-        Tabuleiro: tabuleiro a ser criado. 
-
-    Returns: o tabuleiro gerado.
-    */
     espacoVazio(Ev),
     jogador1(J1),
     jogador2(J2),
@@ -27,8 +25,7 @@ criarTabuleiro(Tabuleiro) :-
         [J1, Ev, Ev, Ev],
         [Ev, Ev, Ev, Ev],
         [Ev, Ev, Ev, Ev],
-        [Ev, Ev, Ev, J2]
-    ].
+        [Ev, Ev, Ev, J2]].
 
 exibirTabuleiros(Tab1, Tab2, Tab3) :-
     /* Exibe os três tabuleiros lado a lado.
@@ -204,3 +201,14 @@ remover_peca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado) :-
     nth1(Linha, Tabuleiro, LinhaLista),
     replace(Coluna, LinhaLista, Ev, NovaLinha),
     replace(Linha, Tabuleiro, NovaLinha, TabuleiroAtualizado).
+
+/*
+ * Verifica se um jogador está presente no tabuleiro.
+ *
+ * @param Tabuleiro O tabuleiro 4x4.
+ * @param Jogador   O símbolo do jogador a ser verificado.
+ * @return          Verdadeiro se o jogador estiver presente no tabuleiro, falso caso contrário.
+ */
+existeJogador(Tabuleiro, Jogador) :-
+    member(Linha, Tabuleiro),
+    member(Jogador, Linha).
