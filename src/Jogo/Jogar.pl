@@ -5,6 +5,8 @@
 :- use_module('./src/Jogo/Movimento.pl').
 :- use_module('./src/Jogo/ControllerPlantas.pl').
 :- use_module('./src/Interface/Jogador.pl').
+:- use_module('./src/Jogo/Coordenadas.pl').
+:- use_module('./src/Jogo/ViagemNoTempo.pl').
 
 /*iniciarJogo :-
     iniciarTabuleiros(Passado, Presente, Futuro),
@@ -87,77 +89,31 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
     ; Foco == futuro -> Tabuleiro = Futuro
     ),
     ( Escolha == 'm' ->
+        repeat,  % Garante que só saímos quando o jogador inserir uma posição válida
         obtemCoordenadas(Linha, Coluna),
-        ( 
-            verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, Jogador) -> 
-            % Caso verdadeiro: executa o movimento
-            movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, Jogador, NovoTabuleiro),
-            ( Foco == passado -> (NovoPassado = NovoTabuleiro, NovoPresente = Presente, NovoFuturo = Futuro)
-            ; Foco == presente -> (NovoPassado = Passado, NovoPresente = NovoTabuleiro, NovoFuturo = Futuro)
-            ; Foco == futuro -> (NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = NovoTabuleiro)
-            )
-            ;
-            
-            % Caso falso: mostra mensagem e chama recursivamente
-            format("Posição inválida! Insira uma posição em que a sua peça (~w) se encontre.\n", [PecaEsperada]),
-            movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, Jogador, NovoTabuleiro)
-        ) 
+        validarPosicao(Tabuleiro, Linha, Coluna, Jogador),
+        escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna),
+        movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, NovaLinha, NovaColuna, Jogador, NovoTabuleiro),
+        ( Foco == passado -> (NovoPassado = NovoTabuleiro, NovoPresente = Presente, NovoFuturo = Futuro)
+        ; Foco == presente -> (NovoPassado = Passado, NovoPresente = NovoTabuleiro, NovoFuturo = Futuro)
+        ; Foco == futuro -> (NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = NovoTabuleiro)
+        )
+
     ; Escolha == 'p' -> 
         writeln("Digite a linha: "),
         read(Linha),
         writeln("Digite a coluna: "),
         read(Coluna),
         plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo)
-    ; Escolha == 'v' -> 
-        writeln("Jogada 'Viajar no tempo' ainda não implementada."),
+
+    ; Escolha == 'v' ->
+        obterCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna),
+        write("Para qual tempo deseja viajar? (passado, presente, futuro): "),
+        read(TempoEscolhido),
+        escolheTempo(Foco, Linha, Coluna, TempoEscolhido, Passado, Presente, Futuro),
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
+
     ; 
         writeln("Escolha inválida! Por favor, escolha uma opção válida."),
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ).
-obtemCoordenadas(Linha, Coluna) :-
-    /* Obtém as coordenadas originais do jogador. 
-
-    Args: 
-        Linha: Linha atual.
-        Coluna: Coluna atual. 
-
-    Returns: A linha e a coluna inseridas. 
-    */
-    obterLinha(Linha),
-    obterColuna(Coluna).
-
-
-obterLinha(Linha) :-
-    /* Obtém uma linha válida para o jogador jogar. 
-
-    Args: 
-        Linha: linha atual do jogador. 
-    
-    Returns: uma linha que atende os limites do tabuleiro. 
-    */
-    write("Informe a linha (1-4): "), read(L),
-    ( integer(L), L >= 1, L =< 4 ->
-        Linha = L
-    ;
-        writeln("Linha inválida! Escolha um valor entre 1 e 4."),
-        obterLinha(Linha) % Repete até obter um valor válido
-    ).
-
-
-obterColuna(Coluna) :-
-    /* Obtém uma coluna válida para o jogador jogar. 
-
-    Args: 
-        Coluna: coluna atual do jogador. 
-    
-    Returns: uma coluna que atende os limites do tabuleiro.
-    */ 
-    write("Informe a coluna (1-4): "), read(C),
-    ( integer(C), C >= 1, C =< 4 ->
-        Coluna = C
-    ;
-        writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
-        obterColuna(Coluna) % Repete até obter um valor válido
-    ).
-

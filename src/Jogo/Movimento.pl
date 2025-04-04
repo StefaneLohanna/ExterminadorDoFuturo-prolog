@@ -1,21 +1,17 @@
-:- module(movimento, [movimento/9]).
+:- module(movimento, [movimento/11]).
 :- use_module('./Tabuleiro.pl', [verificarPosicaoTabuleiro/4, moverPeca/7, exibirTabuleiros/3, semente/1, arbusto/1, arvore/1]).
 
-
-
-movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, PecaEsperada, TabuleiroAtualizado) :-
-    /* Efetua o movimento do jogador. 
+movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, NovaLinha, NovaColuna, PecaEsperada, TabuleiroAtualizado) :-
+    /* Efetua o movimento do jogador com as coordenadas já escolhidas.
 
     Args: 
-        Foco: foco atual do jogador. 
-        Passado: tabuleiro atual que representa o passado. 
-        Presente: tabuleiro atual que representa o presente. 
-        Futuro: tabuleiro atual que representa o futuro. 
-        PecaEsperada: Peca do jogador. 
-        TabuleiroAtualizado: Novo tabuleiro que foi modificado. 
+        Linha, Coluna: posição atual da peça.
+        NovaLinha, NovaColuna: posição para onde mover.
+        PecaEsperada: Peça do jogador. 
+        TabuleiroAtualizado: Novo tabuleiro após a movimentação.
     */
-    escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna),
     moverPeca(Tabuleiro, Linha, Coluna, NovaLinha, NovaColuna, PecaEsperada, TabuleiroAtualizado).
+
 
 verificarPosicao(Tabuleiro, PecaEsperada) :-
     /* Verifica a posição escolhida pelo jogador e repete até encontrar uma válida.
@@ -30,30 +26,4 @@ verificarPosicao(Tabuleiro, PecaEsperada) :-
     ( verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, PecaEsperada) -> true ;
         format("Posição inválida! Insira uma posição em que a sua peça (~w) se encontre.\n", [PecaEsperada]),
         verificarPosicao(Tabuleiro, PecaEsperada)
-    ).
-
-escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
-    /* Pergunta ao jogador para onde deseja mover e calcula a nova posição, garantindo que esteja nos limites.
-        
-    Args:
-        Linha: linha atual da peça.
-        Coluna: coluna atual da peça.
-        NovaLinha: linha após o movimento.
-        NovaColuna: coluna após o movimento.
-
-    Returns: a nova coordenada para que o jogador se mova.
-    */
-    writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
-    read(Direcao),
-    ( Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
-    ; Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
-    ; Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
-    ; Direcao == d -> TempLinha is Linha, TempColuna is Coluna + 1
-    ; writeln("Direção inválida! Use apenas w, a, s ou d."), escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
-    ), 
-    ( TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
-    NovaLinha = TempLinha, NovaColuna = TempColuna
-    ;
-        writeln("Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro."),
-        escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
     ).
