@@ -2,9 +2,9 @@
 
 % Módulo responsável pelo controle do plantio de sementes em diferentes períodos de tempo
 :- module(controllerPlantas, [plantarSemente/9]). % Exporta corretamente o predicado de aridade 9
-
-% Importa o módulo tabuleiro e a função plantar/5, que modifica o estado do tabuleiro
 :- use_module('./src/Jogo/Tabuleiro.pl').
+% Importa o módulo tabuleiro e a função plantar/5, que modifica o estado do tabuleiro
+
 
 /*
  * plantarSemente/9
@@ -45,3 +45,31 @@ plantarSemente(TPassado, TPresente, TFuturo, Tempo, Linha, Coluna, NovoTPassado,
         NovoTPresente = TPresente,
         NovoTFuturo = TempFuturo
     ).
+
+
+
+% Predicado para remover uma semente (comentado pois parece estar incompleto)
+% removerSemente(TPassado, TPresente, TFuturo, Tempo, Linha, Coluna, NovoTPassado, NovoTPresente, NovoTFuturo) :-
+%     semente(Semente),
+%     arbusto(Arbusto),
+%     arvore(Arvore),
+%     (Tempo == 'passado' ->
+%         nth1(Linha, TPassado, LinhaLista),
+%         nth1(Coluna, LinhaLista, Elemento),
+%         planta_certa(Semente, Elemento),
+%         remover_peca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado),
+%         NovoTPassado = TabuleiroAtualizado,
+%         NovoTPresente = TPresente,
+%         NovoTFuturo = TFuturo
+%     ; Tempo == 'presente' ->
+%         plantar(TPresente, Semente, Linha, Coluna, TempPresente),
+%         plantar(TFuturo, Arbusto, Linha, Coluna, TempFuturo),
+%         NovoTPassado = TPassado,
+%         NovoTPresente = TempPresente,
+%         NovoTFuturo = TempFuturo
+%     ; Tempo == 'futuro' ->
+%         plantar(TFuturo, Semente, Linha, Coluna, TempFuturo),
+%         NovoTPassado = TPassado,
+%         NovoTPresente = TPresente,
+%         NovoTFuturo = TempFuturo
+%     ).

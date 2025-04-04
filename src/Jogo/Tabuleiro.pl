@@ -134,7 +134,7 @@ moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestin
     ).
 
 mover_simples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
-   /* Move a Peca com base na linha e a coluna.
+    /* Move a Peca com base na linha e a coluna.
 
     Args: 
         TabuleiroAntigo: tabuleiro original que vai ser atualizado. 
@@ -176,7 +176,7 @@ empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino
     (   
         % Jogador ocupante será empurrado para fora do tabuleiro
         (NovaLinhaOcupante < 1 ; NovaLinhaOcupante > NumLinhas ; 
-         NovaColunaOcupante < 1 ; NovaColunaOcupante > NumColunas) ->
+        NovaColunaOcupante < 1 ; NovaColunaOcupante > NumColunas) ->
         writeln("Jogador morreu!"),
         remover_peca(TabuleiroAntigo, LinhaDestino, ColunaDestino, TabuleiroIntermediario),
         mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
@@ -202,6 +202,7 @@ remover_peca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado) :-
     replace(Coluna, LinhaLista, Ev, NovaLinha),
     replace(Linha, Tabuleiro, NovaLinha, TabuleiroAtualizado).
 
+planta_certa(Planta, Elemento) :- Planta = Elemento.
 /*
  * Verifica se um jogador está presente no tabuleiro.
  *

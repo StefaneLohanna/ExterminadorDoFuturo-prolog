@@ -1,4 +1,4 @@
-:- use_module('../src/Jogo/jogar.pl').
+:- use_module('../src/Jogo/Jogar.pl').
 
 main :-
     /*
