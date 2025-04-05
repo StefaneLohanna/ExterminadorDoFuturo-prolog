@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6]).
+:- module(jogador, [definirFoco/6, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 
@@ -65,3 +65,85 @@ focoValido(presente, Jogador, _, Presente, _) :-
     existeJogador(Presente, Jogador).
 focoValido(futuro, Jogador, _, _, Futuro) :- 
     existeJogador(Futuro, Jogador).
+
+/*
+ * Solicita ao jogador que escolha uma ação.
+ *
+ * @return Escolha  A ação escolhida pelo jogador: 
+ *                  'm' para movimentar,
+ *                  'p' para plantar,
+ *                  'v' para viajar no tempo,
+ *                  'r' para reiniciar o jogo.
+ */
+escolherJogada(Escolha) :-
+    writeln("Escolha uma ação:"),
+    writeln("(m) Movimentar"),
+    writeln("(p) Plantar"),
+    writeln("(v) Viajar no tempo"),
+    writeln("(r) Reiniciar jogo"),
+    write("Digite sua escolha: "),
+    read(E),
+    (
+        member(E, [m, p, v, r]) ->
+            Escolha = E
+        ;
+            writeln("Entrada inválida! Tente novamente."),
+            escolherJogada(Escolha)
+    ).
+
+/*
+ * Obtém coordenadas válidas em que o jogador está posicionado no tabuleiro.
+ *
+ * @param Tabuleiro O tabuleiro atual (passado, presente ou futuro).
+ * @param Jogador   O símbolo do jogador.
+ * @return Linha    A linha em que o jogador está localizado.
+ * @return Coluna   A coluna em que o jogador está localizado.
+ */
+obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
+    obterLinha(L),
+    obterColuna(C),
+    (
+        verificarPosicaoTabuleiro(Tabuleiro, L, C, Jogador) ->
+            Linha = L, Coluna = C
+    ;
+        format("Posição inválida! Insira uma posição em que a sua peça (~w) se encontre.\n", [Jogador]),
+        obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna)
+    ).
+
+/*
+ * Obtém coordenadas do jogador.
+ *
+ * @return Linha  A linha inserida pelo jogador.
+ * @return Coluna A coluna inserida pelo jogador.
+ */
+/*obtemCoordenadas(Linha, Coluna) :-
+    obterLinha(Linha),
+    obterColuna(Coluna).*/
+
+/*
+ * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
+ *
+ * @return Linha  A linha escolhida (de 1 a 4).
+ */
+obterLinha(Linha) :-
+    write("Informe a linha (1-4): "), read(L),
+    ( integer(L), L >= 1, L =< 4 ->
+        Linha = L
+    ;
+        writeln("Linha inválida! Escolha um valor entre 1 e 4."),
+        obterLinha(Linha) % Repete até obter um valor válido
+    ).
+
+/*
+ * Solicita ao jogador uma coluna válida dentro dos limites do tabuleiro.
+ *
+ * @return Coluna  A coluna escolhida (de 1 a 4).
+ */
+obterColuna(Coluna) :-
+    write("Informe a coluna (1-4): "), read(C),
+    ( integer(C), C >= 1, C =< 4 ->
+        Coluna = C
+    ;
+        writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
+        obterColuna(Coluna) % Repete até obter um valor válido
+    ).

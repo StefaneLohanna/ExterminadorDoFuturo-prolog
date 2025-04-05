@@ -1,7 +1,6 @@
 :- module(movimento, [movimento/9]).
-:- use_module('./Tabuleiro.pl', [verificarPosicaoTabuleiro/4, moverPeca/7, exibirTabuleiros/3, semente/1, arbusto/1, arvore/1]).
 
-
+:- use_module('./src/Jogo/Tabuleiro.pl').
 
 movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, PecaEsperada, TabuleiroAtualizado) :-
     /* Efetua o movimento do jogador. 
@@ -17,20 +16,23 @@ movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, PecaEsperad
     escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna),
     moverPeca(Tabuleiro, Linha, Coluna, NovaLinha, NovaColuna, PecaEsperada, TabuleiroAtualizado).
 
-verificarPosicao(Tabuleiro, PecaEsperada) :-
-    /* Verifica a posição escolhida pelo jogador e repete até encontrar uma válida.
+/* Verifica a posição escolhida pelo jogador e repete até encontrar uma válida.
         
-    Args:
-        Tabuleiro: o tabuleiro atual.
-        PecaEsperada: a peça que o jogador deve selecionar.
+Args:
+    Tabuleiro: o tabuleiro atual.
+    PecaEsperada: a peça que o jogador deve selecionar.
     
-    Returns: boolean informando se na posição havia a peça esperada ou não.
-    */
+Returns: boolean informando se na posição havia a peça esperada ou não.
+*/
+/*
+verificarPosicao(Tabuleiro, PecaEsperada) :-
+
     obtemCoordenadas(Linha, Coluna),
     ( verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, PecaEsperada) -> true ;
         format("Posição inválida! Insira uma posição em que a sua peça (~w) se encontre.\n", [PecaEsperada]),
         verificarPosicao(Tabuleiro, PecaEsperada)
     ).
+*/
 
 escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
     /* Pergunta ao jogador para onde deseja mover e calcula a nova posição, garantindo que esteja nos limites.
