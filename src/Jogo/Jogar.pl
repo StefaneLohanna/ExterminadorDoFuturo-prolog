@@ -1,10 +1,15 @@
 % File: jogar.pl
 :- module(jogar, [iniciarJogo/0]).
-
+:- dynamic jogador1_nome/1.
+:- dynamic jogador2_nome/1.
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Jogo/Movimento.pl').
 :- use_module('./src/Jogo/ControllerPlantas.pl').
 :- use_module('./src/Interface/Jogador.pl').
+
+:- use_module(library(readutil)). % para ler linha completa com read_line_to_string
+:- use_module(library(apply)).   % para maplist
+:- use_module(library(strings)). % para string_lower (se necessário)
 
 /*iniciarJogo :-
     iniciarTabuleiros(Passado, Presente, Futuro),
@@ -18,9 +23,43 @@ espacoVazio(_Ev).
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
     */
+    registrarJogadores,
+    jogador1_nome(N1),
     jogador1(J1),
     iniciarTabuleiros(Passado, Presente, Futuro),
-    rodada(J1, passado, futuro, Passado, Presente, Futuro).
+    rodada(J1, N1, passado, futuro, Passado, Presente, Futuro).
+
+removerEspacos(Entrada, Saida) :-
+    string_lower(Entrada, Lower),
+    string_chars(Lower, Chars),
+    exclude(=( ' ' ), Chars, SemEspacos),
+    string_chars(Saida, SemEspacos).
+
+registrarJogadores :-
+    jogador1(J1),
+    jogador2(J2),
+    writeln("\nRegistro do jogadores!"),
+    write("Jogador 1, digite seu nome: "),
+    read_line_to_string(user_input, Nome1),
+    removerEspacos(Nome1, Nome1Min),
+    assertz(jogador1_nome(Nome1Min)),
+    format("Seu personagem será a ~w~n", [J1]),
+
+    write("Jogador 2, digite seu nome: "),
+    read_line_to_string(user_input, Nome2),
+    removerEspacos(Nome2, Nome2Min),
+    assertz(jogador2_nome(Nome2Min)),
+    format("Jogador 2 ficará com o ~w~n", [J2]).
+
+
+registrarJogadorUunico :-
+    jogador1(J1),
+    writeln("\nRegistro do jogador!"),
+    write("Digite seu nome: "),
+    read_line_to_string(user_input, Nome),
+    removerEspacos(Nome, NomeMin),
+    assertz(jogador1_nome(NomeMin)),
+    format("Seu personagem será o ~w~n", [J1]).
 
 /*
  * Controla a rodada do jogo, permitindo que cada jogador realize duas jogadas antes de alternar.
@@ -32,10 +71,11 @@ iniciarJogo :-
  * @param Presente   O tabuleiro representando o estado atual do presente.
  * @param Futuro     O tabuleiro representando o estado atual do futuro.
  */
-rodada(Peca, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
+
+rodada(Peca, Nome, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
     jogador1(J1),
     jogador2(J2),
-    format("Vez do jogador: ~w~n", [Peca]),
+    format("Vez do jogador: ~w (~w)~n", [Nome, Peca]),
 
     % Determina qual foco usar nesta rodada
     (Peca == J1 -> FocoAtual = FocoJ1 ; FocoAtual = FocoJ2),
@@ -56,20 +96,26 @@ rodada(Peca, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
         Peca == J1 -> 
         definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
         NovoFocoJ2 = FocoJ2,
-        NovaPeca = J2
+        NovaPeca = J2,
+        jogador2_nome(NovoNome)
         ;
         definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
         NovoFocoJ1 = FocoJ1,
-        NovaPeca = J1
+        NovaPeca = J1,
+        jogador1_nome(NovoNome)
+
     ),
     writeln("Mudando para o próximo jogador."),
     % Alterna para o outro jogador (mantendo os focos atualizados)
-    rodada(NovaPeca, NovoFocoJ1, NovoFocoJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
+    rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
 
 jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo) :-
     exibirTabuleiros(Passado, Presente, Futuro),
 
     escolherJogada(Escolha),
+
+    %escolherJogada(EscolhaRaw),
+    %removerEspacos(EscolhaRaw, Escolha),
 
     ( Foco == passado -> Tabuleiro = Passado
     ; Foco == presente -> Tabuleiro = Presente
