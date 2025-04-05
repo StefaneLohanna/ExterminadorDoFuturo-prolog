@@ -14,7 +14,7 @@
                 NovoPassado, NovoPresente, NovoFuturo),
 
     exibirTabuleiros(NovoPassado, NovoPresente, NovoFuturo).*/
-espacoVazio(Ev).
+espacoVazio(_Ev).
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
     */
@@ -76,26 +76,22 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
     ; Foco == futuro -> Tabuleiro = Futuro
     ),
 
-    ( Escolha == m ->
+    ( Escolha == 'm' ->
         obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna),
-        movimento(Tabuleiro, Foco, Passado, Presente, Futuro, Linha, Coluna, Jogador, NovoTabuleiro),
-        ( Foco == passado -> (NovoPassado = NovoTabuleiro, NovoPresente = Presente, NovoFuturo = Futuro)
-        ; Foco == presente -> (NovoPassado = Passado, NovoPresente = NovoTabuleiro, NovoFuturo = Futuro)
-        ; Foco == futuro -> (NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = NovoTabuleiro)
-        )
+        movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, Jogador, NovoPassado, NovoPresente, NovoFuturo)
 
-    ; Escolha == p ->
+    ; Escolha == 'p' ->
         writeln("Digite a linha: "),
         read(Linha),
         writeln("Digite a coluna: "),
         read(Coluna),
         plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo)
 
-    ; Escolha == v ->
+    ; Escolha == 'v' ->
         writeln("Jogada 'Viajar no tempo' ainda não implementada."),
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
 
-    ; Escolha == r ->
+    ; Escolha == 'r' ->
         writeln("Reiniciando o jogo..."),
         iniciar_jogo(NovoPassado, NovoPresente, NovoFuturo)
 

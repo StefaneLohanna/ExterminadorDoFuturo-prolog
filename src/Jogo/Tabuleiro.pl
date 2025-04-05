@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5]).
 
 %  Definindo os emojis dos jogadores
 espacoVazio('\x1F533'). 
@@ -124,10 +124,24 @@ remover_peca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado) :-
     replace(Coluna, LinhaLista, Ev, NovaLinha),
     replace(Linha, Tabuleiro, NovaLinha, TabuleiroAtualizado).
 
+removerPlanta(Tabuleiro, Planta, Linha, Coluna, TabuleiroAtualizado) :-
+    % Verifica se a peça na posição é igual à planta especificada
+    nth1(Linha, Tabuleiro, LinhaLista),
+    nth1(Coluna, LinhaLista, PecaAtual),
+    (PecaAtual == Planta ->
+        % Se FOR a planta: remove (substitui por espaço vazio)
+        espacoVazio(Ev),
+        replace(Coluna, LinhaLista, Ev, NovaLinha),
+        replace(Linha, Tabuleiro, NovaLinha, TabuleiroAtualizado)
+    ;
+        % Se NÃO FOR a planta: retorna o tabuleiro original sem alterações
+        TabuleiroAtualizado = Tabuleiro
+    ).
 
 moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
     espacoVazio(Ev),
     arbusto(Arbusto),
+    semente(Semente),
 
     nth1(LinhaDestino, TabuleiroAntigo, LinhaDestinoLista),
     nth1(ColunaDestino, LinhaDestinoLista, ConteudoDestino),
@@ -143,6 +157,10 @@ moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestin
     ;
         ConteudoDestino == Arbusto ->
         remover_peca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, TabuleiroAtualizado)
+    ;
+        ConteudoDestino == Semente ->
+        remover_peca(TabuleiroAntigo, LinhaDestino, ColunaDestino, TabuleiroSemSemente),
+        mover_simples(TabuleiroSemSemente, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
     ;
         % Caso contrário, empurra a peça ocupante.
         empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, ConteudoDestino, TabuleiroAtualizado)
@@ -162,7 +180,7 @@ mover_simples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDe
     Returns: 
         TabuleiroAtualizado: tabuleiro depois que a peça se moveu.
     */
-     espacoVazio(Ev),
+    espacoVazio(Ev),
     nth1(LinhaOrigem, TabuleiroAntigo, LinhaOrigemLista),
     replace(ColunaOrigem, LinhaOrigemLista, Ev, NovaLinhaOrigem),
     replace(LinhaOrigem, TabuleiroAntigo, NovaLinhaOrigem, TabuleiroIntermediario),
