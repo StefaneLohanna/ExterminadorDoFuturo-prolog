@@ -1,6 +1,7 @@
 :- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
+:- use_module('./src/Utils/ImprimirTxt.pl').
 
 /*
  * Define o foco do jogador para a próxima rodada.
@@ -25,16 +26,6 @@ definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
         )
     ;   definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ).
-
-/*
- * Exibe o menu de escolha de foco para o jogador.
- */
-exibirMenuFoco :-
-    writeln('Escolha o foco para suas próximas jogadas:'),
-    writeln('(s) Passado'),
-    writeln('(p) Presente'),
-    writeln('(f) Futuro'),
-    write('Digite sua escolha: ').
 
 /*
  * Traduz a escolha do jogador para o respectivo foco.
@@ -76,12 +67,7 @@ focoValido(futuro, Jogador, _, _, Futuro) :-
  *                  'r' para reiniciar o jogo.
  */
 escolherJogada(Escolha) :-
-    writeln("Escolha uma ação:"),
-    writeln("(m) Movimentar"),
-    writeln("(p) Plantar"),
-    writeln("(v) Viajar no tempo"),
-    writeln("(r) Reiniciar jogo"),
-    write("Digite sua escolha: "),
+    exibirMenuJogadas,
     read(E),
     (
         member(E, [m, p, v, r]) ->
@@ -90,6 +76,18 @@ escolherJogada(Escolha) :-
             writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
     ).
+
+/*
+ * Exibe o menu de jogadas que um jogador pode realizar.
+ */
+exibirMenuJogadas :-
+    imprimirTxt('src/Interface/menus/jogadas.txt').
+
+/*
+ * Exibe o menu de escolha de foco para o jogador.
+ */
+exibirMenuFoco :-
+    imprimirTxt('src/Interface/menus/foco.txt').
 
 /*
  * Obtém coordenadas válidas em que o jogador está posicionado no tabuleiro.
