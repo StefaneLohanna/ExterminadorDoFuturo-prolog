@@ -118,22 +118,6 @@ replace(Index, List, NewElement, NewList) :-
     nth1(Index, NewList, NewElement, Rest).
 
 
-/*moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
-    Move a Peca com base na linha e a coluna.
-    Se a posição destino já estiver ocupada por outra peça, essa peça será movida para uma casa adjacente.
-    
-    espacoVazio(Ev),
-    nth1(LinhaDestino, TabuleiroAntigo, LinhaDestinoLista),
-    nth1(ColunaDestino, LinhaDestinoLista, ConteudoDestino),
-
-    ( ConteudoDestino == Ev ->  
-        % Se a posição destino está vazia, movemos normalmente.
-        mover_simples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
-    ; 
-        % Caso contrário, empurramos a peça ocupante.
-        empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado)
-    ).*/
-
 remover_peca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado) :-
     espacoVazio(Ev),
     nth1(Linha, Tabuleiro, LinhaLista),
@@ -142,9 +126,9 @@ remover_peca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado) :-
 
 
 moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
-   
     espacoVazio(Ev),
     arbusto(Arbusto),
+
     nth1(LinhaDestino, TabuleiroAntigo, LinhaDestinoLista),
     nth1(ColunaDestino, LinhaDestinoLista, ConteudoDestino),
 
@@ -160,7 +144,7 @@ moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestin
         ConteudoDestino == Arbusto ->
         remover_peca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, TabuleiroAtualizado)
     ;
-        % Caso contrário, empurramos a peça ocupante.
+        % Caso contrário, empurra a peça ocupante.
         empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, ConteudoDestino, TabuleiroAtualizado)
     ).
 
@@ -187,69 +171,64 @@ mover_simples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDe
     replace(LinhaDestino, TabuleiroIntermediario, NovaLinhaDestino, TabuleiroAtualizado).
 
 
+% Calcula a próxima posição na direção do empurrão, e verifica os limites do tabuleiro.
+calcula_posicao_destino(LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Tabuleiro, NovaLinha, NovaColuna) :-
+    DirecaoLinha is LinhaDestino - LinhaOrigem,
+    DirecaoColuna is ColunaDestino - ColunaOrigem,
+    NovaLinha is LinhaDestino + DirecaoLinha,
+    NovaColuna is ColunaDestino + DirecaoColuna,
+
+    length(Tabuleiro, NumLinhas),
+    nth1(1, Tabuleiro, PrimeiraLinha),
+    length(PrimeiraLinha, NumColunas),
+
+    % Garantir que as novas coordenadas estão dentro do tabuleiro
+    NovaLinha >= 1, NovaLinha =< NumLinhas,
+    NovaColuna >= 1, NovaColuna =< NumColunas.
+
+
 empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, Empurrado, TabuleiroAtualizado) :- 
     espacoVazio(Ev),
     arbusto(Arbusto),
     arvore(Arvore),
 
-    % Pegamos a peça ocupante na posição de destino
+    % Pega peça ocupante na posição de destino
     nth1(LinhaDestino, TabuleiroAntigo, LinhaDestinoLista),
     nth1(ColunaDestino, LinhaDestinoLista, PecaOcupante),
 
-    % Determinar a direção do movimento
-    DirecaoLinha is LinhaDestino - LinhaOrigem,
-    DirecaoColuna is ColunaDestino - ColunaOrigem,
-    NovaLinhaOcupante is LinhaDestino + DirecaoLinha,
-    NovaColunaOcupante is ColunaDestino + DirecaoColuna,
-
-    % Verificar os limites do tabuleiro
-    length(TabuleiroAntigo, NumLinhas),
-    nth1(1, TabuleiroAntigo, PrimeiraLinha),
-    length(PrimeiraLinha, NumColunas),
-
-    (   
-        % Caso: o empurrado sai do tabuleiro e morre
-        (NovaLinhaOcupante < 1 ; NovaLinhaOcupante > NumLinhas ; 
-         NovaColunaOcupante < 1 ; NovaColunaOcupante > NumColunas) ->
-        writeln("Jogador morreu!"),
-        remover_peca(TabuleiroAntigo, LinhaDestino, ColunaDestino, TabuleiroIntermediario),
-        mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
-    ;
-        % Se a nova posição está dentro dos limites
+    (
+        calcula_posicao_destino(LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, TabuleiroAntigo, NovaLinhaOcupante, NovaColunaOcupante)
+    ->
         nth1(NovaLinhaOcupante, TabuleiroAntigo, NovaLinhaLista),
         nth1(NovaColunaOcupante, NovaLinhaLista, ProximoConteudo),
 
         ( 
-            % Caso: Paradoxo 
             (ProximoConteudo == Empurrado) ->
-            paradoxo(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, Jogador, TabuleiroAtualizado)
+                paradoxo(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, Jogador, TabuleiroAtualizado)
         ; 
-        
             (ProximoConteudo == Arbusto) ->
-            mortePorArbusto(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
-
+                mortePorArbusto(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
         ;
             (ProximoConteudo == Arvore, Empurrado \= Arvore ) ->
-            empurraArvore(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, Jogador, Empurrado, TabuleiroAtualizado) 
+                empurraArvore(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, Jogador, Empurrado, TabuleiroAtualizado)
         ;
-
-            Empurrado == Arvore  ->
-            arvoreCai(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, Jogador, TabuleiroAtualizado) 
-
+            (Empurrado == Arvore)  ->
+                arvoreCai(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, Jogador, TabuleiroAtualizado)
         ;
-            % Caso: Casa vazia, empurra normalmente
             (ProximoConteudo == Ev) ->
-            mover_simples(TabuleiroAntigo, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, PecaOcupante, TabuleiroIntermediario),
-            mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
+                mover_simples(TabuleiroAntigo, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, PecaOcupante, TabuleiroIntermediario),
+                mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
         ;
-            % Caso: Empurrão em cadeia
-            (ProximoConteudo \= Ev)->
-            empurrar(TabuleiroAntigo, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, PecaOcupante, Empurrado, NovoTabuleiro),
-            mover_simples(NovoTabuleiro, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
-
+            (ProximoConteudo \= Ev) ->
+            empurrar(TabuleiroAntigo, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, PecaOcupante, ProximoConteudo, TabuleiroDepoisEmpurrar),
+            mover_simples(TabuleiroDepoisEmpurrar, LinhaDestino, ColunaDestino, NovaLinhaOcupante, NovaColunaOcupante, PecaOcupante, TabuleiroIntermediario),
+            mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
         )
+    ;
+        writeln("Jogador morreu!"),
+        remover_peca(TabuleiroAntigo, LinhaDestino, ColunaDestino, TabuleiroIntermediario),
+        mover_simples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
     ).
-
 
 
 paradoxo(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmpurrado, NovaLinha, NovaColuna, JogadorEmpurrador, TabuleiroAtualizado) :-
@@ -301,7 +280,6 @@ arvoreCai(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEm
     replace(ColunaEmpurrado, LinhaEmpurradoLista, JogadorEmpurrador, NovaLinhaEmpurrado),
     replace(LinhaEmpurrado, TabuleiroSemArvore, NovaLinhaEmpurrado, TabuleiroComEmpurrador),
 
-
     % Limpa a posição original do empurrador
     nth1(LinhaEmpurrador, TabuleiroComEmpurrador, LinhaEmpurradorVazia),
     replace(ColunaEmpurrador, LinhaEmpurradorVazia, Ev, NovaLinhaEmpurradorVazia),
@@ -322,12 +300,22 @@ arvoreCai(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEm
         TabuleiroAtualizado = TabuleiroMovido
     ).
 
-    
-empurraArvore(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmpurrado, NovaLinha, NovaColuna, JogadorEmpurrador, JogadorEmpurrado, TabuleiroAtualizado) :-
+
+empurraArvore(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmpurrado,NovaLinha, NovaColuna, JogadorEmpurrador, JogadorEmpurrado, TabuleiroAtualizado) :- 
     espacoVazio(Ev),
 
+    (
+        calcula_posicao_destino(LinhaEmpurrado, ColunaEmpurrado, NovaLinha, NovaColuna, Tabuleiro, LinhaArvoreCai, ColunaArvoreCai)
+    ->
+        nth1(LinhaArvoreCai, Tabuleiro, LinhaAlvo),
+        replace(ColunaArvoreCai, LinhaAlvo, Ev, NovaLinhaAlvo),
+        replace(LinhaArvoreCai, Tabuleiro, NovaLinhaAlvo, TabuleiroArvoreCaiAtualizado)
+    ;
+        TabuleiroArvoreCaiAtualizado = Tabuleiro
+    ),
+
     % Remove a árvore do destino
-    remover_peca(Tabuleiro, NovaLinha, NovaColuna, TabuleiroSemArvore),
+    remover_peca(TabuleiroArvoreCaiAtualizado, NovaLinha, NovaColuna, TabuleiroSemArvore),
 
     % Move o empurrado para a posição onde estava a árvore
     nth1(NovaLinha, TabuleiroSemArvore, LinhaEmpurradoLista),
@@ -343,6 +331,7 @@ empurraArvore(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, Colu
     nth1(LinhaEmpurrador, TabuleiroComJogadores, LinhaEmpurradorVazia),
     replace(ColunaEmpurrador, LinhaEmpurradorVazia, Ev, NovaLinhaEmpurradorVazia),
     replace(LinhaEmpurrador, TabuleiroComJogadores, NovaLinhaEmpurradorVazia, TabuleiroAtualizado).
+
 
 planta_certa(Planta, Elemento) :- Planta = Elemento.
 
