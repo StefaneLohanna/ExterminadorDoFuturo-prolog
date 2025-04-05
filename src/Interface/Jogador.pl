@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 

@@ -40,19 +40,25 @@ rodada(Peca, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
     % Determina qual foco usar nesta rodada
     (Peca == J1 -> FocoAtual = FocoJ1 ; FocoAtual = FocoJ2),
 
-    jogar(FocoAtual, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1),
-    jogar(FocoAtual, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2),
+    % Verifica se o jogador está presente no foco atual
+    (focoValido(FocoAtual, Peca, Passado, Presente, Futuro) -> NovoFoco = FocoAtual;
+        writeln('Jogador não está presente nesse foco. Escolha outro.'),
+        definirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)
+    ),
+
+    jogar(NovoFoco, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1),
+    jogar(NovoFoco, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2),
     
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
     
     % Define o foco para a próxima rodada
     (
         Peca == J1 -> 
-        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, FocoAtual, NovoFocoJ1),
+        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
         NovoFocoJ2 = FocoJ2,
         NovaPeca = J2
         ;
-        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, FocoAtual, NovoFocoJ2),
+        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
         NovoFocoJ1 = FocoJ1,
         NovaPeca = J1
     ),
