@@ -18,11 +18,21 @@ espacoVazio(_Ev).
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
     */
-    registrarJogadores,
-    jogador1_nome(N1),
-    jogador1(J1),
-    iniciarTabuleiros(Passado, Presente, Futuro),
-    rodada(J1, N1, passado, futuro, 0, 0, Passado, Presente, Futuro).
+    escolherOpcaoMenu(OpcaoMenu),
+    exibirOpcaoMenu(OpcaoMenu),
+    (
+        OpcaoMenu == j ->
+        registrarJogadores,
+        jogador1_nome(N1),
+        jogador1(J1),
+        iniciarTabuleiros(Passado, Presente, Futuro),
+        rodada(J1, N1, passado, futuro, 0, 0, Passado, Presente, Futuro)  
+        ;
+        OpcaoMenu == s ->
+        halt
+        ;
+        iniciarJogo
+    ).
 
 formatar(Entrada, Saida) :-
     string_lower(Entrada, Lower),
@@ -78,7 +88,6 @@ registrarJogadorUunico :-
 rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :-
     jogador1(J1),
     jogador2(J2),
-
     %% Usa o predicado auxiliar para obter o nome correto
     nomeDoJogador(Peca, Nome),
     format("Vez do jogador: ~w (~w)~n", [Nome, Peca]),
@@ -92,6 +101,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
 
     % Verifica se o jogador está presente no foco atual
     (focoValido(FocoAtual, Peca, Passado, Presente, Futuro) -> NovoFoco = FocoAtual;
+        %format("~w Jogador não está presente nesse foco. Escolha outro. ~n", [Exclamacao]),
         writeln('Jogador não está presente nesse foco. Escolha outro.'),
         definirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ),

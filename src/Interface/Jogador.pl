@@ -1,7 +1,8 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
+:- use_module('./src/Utils/Ranking.pl').
 
 /*
  * Define o foco do jogador para a próxima rodada.
@@ -29,8 +30,6 @@ definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
         )
     ;   definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ).
-
-espacoVazio(_Ev).
 
 
 /*
@@ -76,8 +75,8 @@ escolherJogada(Escolha) :-
     exibirMenuJogadas,
     read_line_to_string(user_input, Entrada),
     string_lower(Entrada, Lower),
-    removerEspacos(Lower, EntradaLimpa),
-    atom_string(EscolhaConvertida, EntradaLimpa),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(EscolhaConvertida, EntradaSemEspaco),
     (
         member(EscolhaConvertida, [m, p, v, r]) ->
             Escolha = EscolhaConvertida
@@ -85,6 +84,43 @@ escolherJogada(Escolha) :-
             writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
     ).
+
+
+exibirMenu :-
+    imprimirTxt('src/Interface/menus/menu.txt').
+
+
+escolherOpcaoMenu(EscolhaFinal) :-
+    exibirMenu,
+    negado(Negado),
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(Escolha, EntradaSemEspaco),
+    (
+        member(Escolha, [d, s, m, j, r]) ->
+            EscolhaFinal = Escolha 
+        ;
+        format("~w Entrada inválida!~n", [Negado]),
+        escolherOpcaoMenu(EscolhaFinal)
+    ).
+
+exibirOpcaoMenu(Opcao) :-
+    ( 
+        Opcao == r ->
+        mostrarRanking
+    ;   
+        Opcao == j ->
+        true
+    ;
+        Opcao == s ->
+        true
+    
+    ).
+
+
+
+
 
 
 /*
@@ -241,12 +277,21 @@ obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna) :-
     ).
 
 
+exibirMenuViagem :-
+    imprimirTxt('src/Interface/menus/viagem.txt').
+
 escolherTempo(TempoEscolhido) :-
-    writeln("Escolha para qual tempo deseja viajar:"),
+    /*writeln("Escolha para qual tempo deseja viajar:"),
     writeln("(s) passado"),
     writeln("(p) presente"),
     writeln("(f) futuro"),
-    read(Entrada),
+    read(Entrada),*/
+    exibirMenuViagem,
+    read_line_to_string(user_input, Escolha),
+    string_lower(Escolha, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(Entrada, EntradaSemEspaco),
+
     ( Entrada == s -> TempoEscolhido = "passado"
     ; Entrada == p -> TempoEscolhido = "presente"
     ; Entrada == f -> TempoEscolhido = "futuro"
