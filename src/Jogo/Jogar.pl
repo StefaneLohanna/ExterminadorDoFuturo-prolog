@@ -1,5 +1,5 @@
 % File: jogar.pl
-:- module(jogar, [iniciarJogo/0, formatar/2]).
+:- module(jogar, [iniciarJogo/0]).
 :- dynamic jogador1_nome/1.
 :- dynamic jogador2_nome/1.
 :- use_module('./src/Jogo/Tabuleiro.pl').
@@ -86,11 +86,30 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
         definirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ),
 
+    % Primeira jogada
     jogar(NovoFoco, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1),
+
+    % Verifica vitória após a primeira jogada
+    (verificarVitoria(NovoPassado1, NovoPresente1, NovoFuturo1, Peca) ->
+        exibirTabuleiros(NovoPassado1, NovoPresente1, NovoFuturo1),
+        finalizarJogo(Peca, Nome)
+    ;
+        true
+    ),
+
+    % Segunda jogada
     jogar(NovoFoco, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2),
-    
+
+    % Verifica vitória após a segunda jogada
+    (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
+        exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
+        finalizarJogo(Peca, Nome)
+    ;
+        true
+    ),
+
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
-    
+
     % Define o foco para a próxima rodada
     (
         Peca == J1 -> 
@@ -103,7 +122,6 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
         NovoFocoJ1 = FocoJ1,
         NovaPeca = J1,
         jogador1_nome(NovoNome)
-
     ),
     writeln("Mudando para o próximo jogador."),
     % Alterna para o outro jogador (mantendo os focos atualizados)
@@ -113,6 +131,7 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
     exibirTabuleiros(Passado, Presente, Futuro),
 
     escolherJogada(Escolha),
+
 
     ( Foco == passado -> Tabuleiro = Passado
     ; Foco == presente -> Tabuleiro = Presente
@@ -142,3 +161,11 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
         writeln("Escolha inválida inesperada!"),
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ).
+
+% Exibe a mensagem de fim de jogo
+finalizarJogo(Peca, NomeJogador) :-
+    write('Jogo encerrado! O jogador vencedor é: '),
+    write(Peca), nl,
+    format("~nFim de jogo! ~w venceu a partida!~n", [NomeJogador]),
+    write('Parabéns pela vitória!'), nl,
+    halt.
