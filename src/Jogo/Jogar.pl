@@ -78,8 +78,12 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro
     jogador2(J2),
     format("Vez do jogador: ~w (~w)~n", [Nome, Peca]),
 
-    (Peca == J1 -> (FocoAtual = FocoJ1, CloneAtual = ClonesJ1) 
-    ;              (FocoAtual = FocoJ2, CloneAtual = ClonesJ2)),
+    (Peca == J1 ->
+        (FocoAtual = FocoJ1, CloneAtual = ClonesJ1)
+    ;
+        (FocoAtual = FocoJ2, CloneAtual = ClonesJ2)
+    ),
+            
 
     % Verifica se o jogador está presente no foco atual
     (focoValido(FocoAtual, Peca, Passado, Presente, Futuro) -> NovoFoco = FocoAtual;
@@ -99,7 +103,7 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro
     ),
 
     % Segunda jogada
-    jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, NovoFocoJ2),
+    jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, NovoFoco2),
 
     % Verifica vitória após a segunda jogada
     (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
@@ -108,25 +112,34 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro
     ;
         true
     ),
-
+    
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
+    
     % Define o foco para a próxima rodada
     (
-        Peca == J1 -> 
-        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
-        NovoFocoJ2 = FocoJ2,
-        NovaPeca = J2,
-        NovosClonesJ1 = NovoClone2,
-        NovosClonesJ2 = ClonesJ2,
-        jogador2_nome(NovoNome)
+        Peca == J1 ->
+            once((
+                definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco2, NovoFocoJ1),
+                NovoFocoJ2 = FocoJ2,
+                NovaPeca = J2,
+                NovosClonesJ1 = NovoClone2,
+                NovosClonesJ2 = ClonesJ2,
+                jogador2_nome(NovoNome),
+                writeln("chegou5")
+            ))
         ;
-        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
-        NovoFocoJ1 = FocoJ1,
-        NovaPeca = J1,
-        NovosClonesJ1 = ClonesJ1, 
-        NovosClonesJ2 = NovoClone2,
-        jogador1_nome(NovoNome)
+            once((
+                definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco2, NovoFocoJ2),
+                NovoFocoJ1 = FocoJ1,
+                NovaPeca = J1,
+                NovosClonesJ1 = ClonesJ1,
+                NovosClonesJ2 = NovoClone2,
+                jogador1_nome(NovoNome),
+                writeln("chegou6")
+            ))
     ),
+    
+    
 
     writeln("Mudando para o próximo jogador."),
 
@@ -167,8 +180,9 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
     (
         Resultado == "viagem impossível" ->
             writeln("Viagem impossível. Tente outra jogada."),
-            jogar(Foco, Clones, Jogador, Passado, Presente, Futuro,
-                  NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+            jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
+                    NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+
         ;
         (
             ( TempoEscolhido == "passado" -> TabDestino = Passado ;
@@ -184,8 +198,9 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
                     stringParaFoco(TempoEscolhido, NovoFoco)
                 ;
                     writeln("A posição no tempo de destino já está ocupada. Tente outra jogada."),
-                    jogar(Foco, Clones, Jogador, Passado, Presente, Futuro,
-                          NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+                    jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
+                        NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+
             )
         )
     )

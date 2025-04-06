@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/4, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/4, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7, verificaPosicaoLivre/4]).
 
 
 %  Definindo os emojis dos jogadores
@@ -450,3 +450,15 @@ verificarVitoria(Passado, Presente, Futuro, JogadorAtual) :-
 
     % Se o adversário está em apenas um tabuleiro, o jogador atual vence
     Soma =:= 1.
+
+verificaPosicaoLivre(Tabuleiro, Linha, Coluna, true) :-
+    espacoVazio(Ev),
+    nth1(Linha, Tabuleiro, LinhaTab),
+    nth1(Coluna, LinhaTab, Casa),
+    Casa == Ev.
+
+verificaPosicaoLivre(Tabuleiro, Linha, Coluna, false) :-
+    espacoVazio(Ev),
+    nth1(Linha, Tabuleiro, LinhaTab),
+    nth1(Coluna, LinhaTab, Casa),
+    Casa \== Ev.

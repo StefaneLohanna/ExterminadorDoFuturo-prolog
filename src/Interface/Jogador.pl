@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, verificaPosicaoLivre/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
@@ -219,17 +219,6 @@ lerDirecaoValida(Direcao) :-
     ).
     
 
-verificaPosicaoLivre(Tabuleiro, Linha, Coluna, true) :-
-    espacoVazio(Ev),
-    nth1(Linha, Tabuleiro, LinhaTab),
-    nth1(Coluna, LinhaTab, Casa),
-    Casa == Ev.
-
-verificaPosicaoLivre(Tabuleiro, Linha, Coluna, false) :-
-    espacoVazio(Ev),
-    nth1(Linha, Tabuleiro, LinhaTab),
-    nth1(Coluna, LinhaTab, Casa),
-    Casa \== Ev.
 
 /*
  * Obtém coordenadas de origem válidas para o jogador, ou seja,
