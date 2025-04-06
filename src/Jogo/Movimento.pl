@@ -2,6 +2,8 @@
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Jogo/ControllerPlantas.pl').
+:- use_module('./src/Interface/Jogador.pl').
+
 
 movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, PecaEsperada, NovoPassado, NovoPresente, NovoFuturo) :-
     /* Efetua o movimento do jogador. 
@@ -67,15 +69,18 @@ escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
     Returns: a nova coordenada para que o jogador se mova.
     */
     writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
-    read(Direcao),
+    read_line_to_string(user_input, Entrada),
+    removerEspacos(Entrada, EntradaSemEspaco),
+    atom_string(Direcao, EntradaSemEspaco),
     ( Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
     ; Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
     ; Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
     ; Direcao == d -> TempLinha is Linha, TempColuna is Coluna + 1
-    ; writeln("Direção inválida! Use apenas w, a, s ou d."), escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
+    ; writeln("Direção inválida! Use apenas w, a, s ou d."),
+      escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
     ), 
     ( TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
-    NovaLinha = TempLinha, NovaColuna = TempColuna
+        NovaLinha = TempLinha, NovaColuna = TempColuna
     ;
         writeln("Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro."),
         escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)

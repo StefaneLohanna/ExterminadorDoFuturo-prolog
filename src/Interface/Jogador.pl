@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, removerEspacos/2]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
@@ -15,7 +15,9 @@
  */
 definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
     exibirMenuFoco,
-    read(Escolha),
+    read_line_to_string(user_input, Entrada),
+    removerEspacos(Entrada, EntradaSemEspaco),
+    atom_string(Escolha, EntradaSemEspaco),
     (   traduzirEscolha(Escolha, FocoTentativa) ->
         (   focoValido(FocoTentativa, Jogador, Passado, Presente, Futuro) ->
             NovoFoco = FocoTentativa,
@@ -26,6 +28,7 @@ definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
         )
     ;   definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ).
+
 
 /*
  * Traduz a escolha do jogador para o respectivo foco.
@@ -68,14 +71,17 @@ focoValido(futuro, Jogador, _, _, Futuro) :-
  */
 escolherJogada(Escolha) :-
     exibirMenuJogadas,
-    read(E),
+    read_line_to_string(user_input, Entrada),
+    removerEspacos(Entrada, EntradaLimpa),
+    atom_string(EscolhaConvertida, EntradaLimpa),
     (
-        member(E, [m, p, v, r]) ->
-            Escolha = E
+        member(EscolhaConvertida, [m, p, v, r]) ->
+            Escolha = EscolhaConvertida
         ;
             writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
     ).
+
 
 /*
  * Exibe o menu de jogadas que um jogador pode realizar.
@@ -118,19 +124,27 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
     obterLinha(Linha),
     obterColuna(Coluna).*/
 
+
 /*
  * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
  *
  * @return Linha  A linha escolhida (de 1 a 4).
  */
+ 
 obterLinha(Linha) :-
-    write("Informe a linha (1-4): "), read(L),
-    ( integer(L), L >= 1, L =< 4 ->
-        Linha = L
+    write("Informe a linha (1-4): "),
+    read_line_to_codes(user_input, Codes),
+    string_codes(String, Codes),
+    normalize_space(string(EntradaSemEspaco), String),
+    ( number_string(Numero, EntradaSemEspaco),
+      integer(Numero), Numero >= 1, Numero =< 4 ->
+        Linha = Numero
     ;
         writeln("Linha inválida! Escolha um valor entre 1 e 4."),
-        obterLinha(Linha) % Repete até obter um valor válido
+        obterLinha(Linha)  % Repete até obter um valor válido
     ).
+
+
 
 /*
  * Solicita ao jogador uma coluna válida dentro dos limites do tabuleiro.
@@ -138,10 +152,19 @@ obterLinha(Linha) :-
  * @return Coluna  A coluna escolhida (de 1 a 4).
  */
 obterColuna(Coluna) :-
-    write("Informe a coluna (1-4): "), read(C),
-    ( integer(C), C >= 1, C =< 4 ->
-        Coluna = C
+    write("Informe a coluna (1-4): "),
+    read_line_to_codes(user_input, Codes),
+    string_codes(String, Codes),
+    normalize_space(string(EntradaSemEspaco), String),
+    ( number_string(Numero, EntradaSemEspaco),
+      integer(Numero), Numero >= 1, Numero =< 4 ->
+        Coluna = Numero
     ;
         writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
-        obterColuna(Coluna) % Repete até obter um valor válido
+        obterColuna(Coluna)  % Repete até obter um valor válido
     ).
+
+
+removerEspacos(Str, SemEspacos) :-
+    split_string(Str, " ", "", Lista),
+    atomic_list_concat(Lista, "", SemEspacos).

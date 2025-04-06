@@ -1,5 +1,5 @@
 % File: jogar.pl
-:- module(jogar, [iniciarJogo/0]).
+:- module(jogar, [iniciarJogo/0, formatar/2]).
 :- dynamic jogador1_nome/1.
 :- dynamic jogador2_nome/1.
 :- use_module('./src/Jogo/Tabuleiro.pl').
@@ -29,7 +29,7 @@ iniciarJogo :-
     iniciarTabuleiros(Passado, Presente, Futuro),
     rodada(J1, N1, passado, futuro, Passado, Presente, Futuro).
 
-removerEspacos(Entrada, Saida) :-
+formatar(Entrada, Saida) :-
     string_lower(Entrada, Lower),
     string_chars(Lower, Chars),
     exclude(=( ' ' ), Chars, SemEspacos),
@@ -41,13 +41,13 @@ registrarJogadores :-
     writeln("\nRegistro do jogadores!"),
     write("Jogador 1, digite seu nome: "),
     read_line_to_string(user_input, Nome1),
-    removerEspacos(Nome1, Nome1Min),
+    formatar(Nome1, Nome1Min),
     assertz(jogador1_nome(Nome1Min)),
     format("Seu personagem será a ~w~n", [J1]),
 
     write("Jogador 2, digite seu nome: "),
     read_line_to_string(user_input, Nome2),
-    removerEspacos(Nome2, Nome2Min),
+    formatar(Nome2, Nome2Min),
     assertz(jogador2_nome(Nome2Min)),
     format("Jogador 2 ficará com o ~w~n", [J2]).
 
@@ -57,7 +57,7 @@ registrarJogadorUunico :-
     writeln("\nRegistro do jogador!"),
     write("Digite seu nome: "),
     read_line_to_string(user_input, Nome),
-    removerEspacos(Nome, NomeMin),
+    formatar(Nome, NomeMin),
     assertz(jogador1_nome(NomeMin)),
     format("Seu personagem será o ~w~n", [J1]).
 
@@ -113,9 +113,6 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
     exibirTabuleiros(Passado, Presente, Futuro),
 
     escolherJogada(Escolha),
-
-    %escolherJogada(EscolhaRaw),
-    %removerEspacos(EscolhaRaw, Escolha),
 
     ( Foco == passado -> Tabuleiro = Passado
     ; Foco == presente -> Tabuleiro = Presente
