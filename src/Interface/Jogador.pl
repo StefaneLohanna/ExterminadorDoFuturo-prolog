@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, verificaPosicaoLivre/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 
@@ -65,3 +65,165 @@ focoValido(presente, Jogador, _, Presente, _) :-
     existeJogador(Presente, Jogador).
 focoValido(futuro, Jogador, _, _, Futuro) :- 
     existeJogador(Futuro, Jogador).
+
+/*
+ * Solicita ao jogador que escolha uma ação.
+ *
+ * @return Escolha  A ação escolhida pelo jogador: 
+ *                  'm' para movimentar,
+ *                  'p' para plantar,
+ *                  'v' para viajar no tempo,
+ *                  'r' para reiniciar o jogo.
+ */
+escolherJogada(Escolha) :-
+    writeln("Escolha uma ação:"),
+    writeln("(m) Movimentar"),
+    writeln("(p) Plantar"),
+    writeln("(v) Viajar no tempo"),
+    writeln("(r) Reiniciar jogo"),
+    write("Digite sua escolha: "),
+    read(E),
+    (
+        member(E, [m, p, v, r]) ->
+            Escolha = E
+        ;
+            writeln("Entrada inválida! Tente novamente."),
+            escolherJogada(Escolha)
+    ).
+
+/*
+ * Obtém coordenadas válidas em que o jogador está posicionado no tabuleiro.
+ *
+ * @param Tabuleiro O tabuleiro atual (passado, presente ou futuro).
+ * @param Jogador   O símbolo do jogador.
+ * @return Linha    A linha em que o jogador está localizado.
+ * @return Coluna   A coluna em que o jogador está localizado.
+ */
+obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
+    obterLinha(L),
+    obterColuna(C),
+    (
+        verificarPosicaoTabuleiro(Tabuleiro, L, C, Jogador) ->
+            Linha = L, Coluna = C
+    ;
+        format("Posição inválida! Insira uma posição em que a sua peça (~w) se encontre.\n", [Jogador]),
+        obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna)
+    ).
+
+/*
+ * Obtém coordenadas do jogador.
+ *
+ * @return Linha  A linha inserida pelo jogador.
+ * @return Coluna A coluna inserida pelo jogador.
+ */
+/*obtemCoordenadas(Linha, Coluna) :-
+    obterLinha(Linha),
+    obterColuna(Coluna).*/
+
+/*
+ * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
+ *
+ * @return Linha  A linha escolhida (de 1 a 4).
+ */
+obterLinha(Linha) :-
+    write("Informe a linha (1-4): "), read(L),
+    ( integer(L), L >= 1, L =< 4 ->
+        Linha = L
+    ;
+        writeln("Linha inválida! Escolha um valor entre 1 e 4."),
+        obterLinha(Linha) % Repete até obter um valor válido
+    ).
+
+/*
+ * Solicita ao jogador uma coluna válida dentro dos limites do tabuleiro.
+ *
+ * @return Coluna  A coluna escolhida (de 1 a 4).
+ */
+obterColuna(Coluna) :-
+    write("Informe a coluna (1-4): "), read(C),
+    ( integer(C), C >= 1, C =< 4 ->
+        Coluna = C
+    ;
+        writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
+        obterColuna(Coluna) % Repete até obter um valor válido
+    ).
+
+escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
+    lerDirecaoValida(Direcao),
+    (
+        Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
+    ;   Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
+    ;   Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
+    ;   Direcao == d -> TempLinha is Linha, TempColuna is Coluna + 1
+    ),
+    (
+        TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
+            NovaLinha = TempLinha,
+            NovaColuna = TempColuna
+    ;
+        writeln("Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro."),
+        escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
+    ).
+
+lerDirecaoValida(Direcao) :-
+    writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
+    read(Input),
+    ( member(Input, [w, a, s, d]) ->
+        Direcao = Input
+    ;
+        writeln("Direção inválida! Use apenas w, a, s ou d."),
+        lerDirecaoValida(Direcao)
+    ).
+    
+
+verificaPosicaoLivre(Tabuleiro, Linha, Coluna, true) :-
+    espacoVazio(Ev),
+    nth1(Linha, Tabuleiro, LinhaTab),
+    nth1(Coluna, LinhaTab, Casa),
+    Casa == Ev.
+
+verificaPosicaoLivre(Tabuleiro, Linha, Coluna, false) :-
+    espacoVazio(Ev),
+    nth1(Linha, Tabuleiro, LinhaTab),
+    nth1(Coluna, LinhaTab, Casa),
+    Casa \== Ev.
+
+/*
+ * Obtém coordenadas de origem válidas para o jogador, ou seja,
+ * verifica se existe uma peça do jogador naquela posição.
+ *
+ * @param Tabuleiro O tabuleiro atual (passado, presente ou futuro).
+ * @param Jogador   O símbolo do jogador.
+ * @param Linha     A linha onde a peça do jogador está.
+ * @param Coluna    A coluna onde a peça do jogador está.
+ */
+obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna) :-
+    obterLinha(L),
+    obterColuna(C),
+    (
+        verificarPosicaoTabuleiro(Tabuleiro, L, C, Jogador) ->
+            Linha = L, Coluna = C
+    ;
+        format("Não há peça sua na posição (~d, ~d). Tente novamente.\n", [L, C]),
+        obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna)
+    ).
+
+
+escolherTempo(TempoEscolhido) :-
+    writeln("Escolha para qual tempo deseja viajar:"),
+    writeln("(s) passado"),
+    writeln("(p) presente"),
+    writeln("(f) futuro"),
+    read(Entrada),
+    ( Entrada == s -> TempoEscolhido = "passado"
+    ; Entrada == p -> TempoEscolhido = "presente"
+    ; Entrada == f -> TempoEscolhido = "futuro"
+    ; writeln("Opção inválida, tente novamente."), escolherTempo(TempoEscolhido)
+    ).
+
+stringParaFoco("passado", passado).
+stringParaFoco("presente", presente).
+stringParaFoco("futuro", futuro).
+
+
+

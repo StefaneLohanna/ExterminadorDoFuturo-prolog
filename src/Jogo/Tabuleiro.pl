@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, espacoVazio/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2]).
+:- module(tabuleiro, [criarTabuleiro/1, espacoVazio/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificar_matriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7]).
 
 %  Definindo os emojis dos jogadores
 espacoVazio('\x1F533'). 
@@ -213,3 +213,74 @@ planta_certa(Planta, Elemento) :- Planta = Elemento.
 existeJogador(Tabuleiro, Jogador) :-
     member(Linha, Tabuleiro),
     member(Jogador, Linha).
+
+
+viagemNoTabuleiro(TabAtual, TabDestino, Linha, Coluna, Jogador, NovoTabAtual, NovoTabDestino) :-
+/*
+ * Viaja no tempo sem criar clones.
+ * Move a peça do jogador da posição atual em TabAtual para a mesma posição em TabDestino.
+ * Remove a peça da posição original e insere na nova.
+ * 
+ * @param TabAtual O tabuleiro atual (onde está a peça antes da viagem).
+ * @param TabDestino O tabuleiro de destino (para onde a peça irá).
+ * @param Linha A linha da posição da peça (1 a 4).
+ * @param Coluna A coluna da posição da peça (1 a 4).
+ * @param Jogador A peça do jogador.
+ * @param NovoTabAtual Tabuleiro atualizado com a remoção da peça.
+ * @param NovoTabDestino Tabuleiro de destino com a peça inserida.
+ */
+    espacoVazio(Ev),
+    substituirCelula(TabAtual, Linha, Coluna, Ev, NovoTabAtual),
+    substituirCelula(TabDestino, Linha, Coluna, Jogador, NovoTabDestino).
+
+viagemNoTabuleiroClones(TabAtual, TabDestino, Linha, Coluna, Jogador, NovoTabAtual, NovoTabDestino) :-
+/*
+ * Viaja no tempo com criação de clone.
+ * Apenas adiciona a peça na posição correspondente do tabuleiro de destino.
+ * O tabuleiro atual permanece inalterado.
+ * 
+ * @param TabAtual O tabuleiro atual (permanece inalterado).
+ * @param TabDestino O tabuleiro de destino (recebe a nova peça).
+ * @param Linha A linha da posição da peça (1 a 4).
+ * @param Coluna A coluna da posição da peça (1 a 4).
+ * @param Jogador A peça do jogador.
+ * @param NovoTabAtual Mesmo tabuleiro original (nenhuma alteração).
+ * @param NovoTabDestino Tabuleiro de destino com a nova peça inserida.
+ */
+    NovoTabAtual = TabAtual,
+    substituirCelula(TabDestino, Linha, Coluna, Jogador, NovoTabDestino).
+
+substituirCelula(Tabuleiro, Linha1Base, Coluna1Base, NovoElem, NovoTabuleiro) :-
+/*
+ * Substitui um elemento em uma célula do tabuleiro (lista de listas).
+ * 
+ * @param Tabuleiro O tabuleiro original (lista de listas).
+ * @param Linha1Base A linha (1 a 4) da célula a ser substituída.
+ * @param Coluna1Base A coluna (1 a 4) da célula a ser substituída.
+ * @param NovoElem O novo elemento que substituirá o antigo.
+ * @param NovoTabuleiro O novo tabuleiro com a célula substituída.
+ */ 
+    LinhaIndex is Linha1Base - 1,
+    ColunaIndex is Coluna1Base - 1,
+    nth0(LinhaIndex, Tabuleiro, LinhaAtual),
+    substituirEmLista(LinhaAtual, ColunaIndex, NovoElem, NovaLinha),
+    substituirEmLista(Tabuleiro, LinhaIndex, NovaLinha, NovoTabuleiro).
+
+
+substituirEmLista([_|T], 0, Elem, [Elem|T]).
+/*
+ * Caso base: substitui o elemento na posição 0 da lista.
+ */
+substituirEmLista([H|T], Index, Elem, [H|Resto]) :-
+/*
+ * Caso recursivo: percorre a lista até alcançar o índice desejado.
+ * 
+ * @param [H|T] Lista original.
+ * @param Index Índice do elemento a ser substituído.
+ * @param Elem Novo elemento a ser inserido.
+ * @param [H|Resto] Lista resultante com substituição feita.
+ */
+    Index > 0,
+    Index1 is Index - 1,
+    substituirEmLista(T, Index1, Elem, Resto).
+
