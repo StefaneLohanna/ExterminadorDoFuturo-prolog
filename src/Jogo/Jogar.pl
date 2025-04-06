@@ -1,25 +1,19 @@
-% File: jogar.pl
 :- module(jogar, [iniciarJogo/0]).
+
 :- dynamic jogador1_nome/1.
 :- dynamic jogador2_nome/1.
+
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Jogo/Movimento.pl').
 :- use_module('./src/Jogo/ControllerPlantas.pl').
 :- use_module('./src/Interface/Jogador.pl').
+:- use_module('./src/Utils/Ranking.pl').
 :- use_module('./src/Jogo/ViagemNoTempo.pl').
 
 :- use_module(library(readutil)). % para ler linha completa com read_line_to_string
 :- use_module(library(apply)).   % para maplist
 :- use_module(library(strings)). % para string_lower (se necessário)
 
-/*iniciarJogo :-
-    iniciarTabuleiros(Passado, Presente, Futuro),
-    exibirTabuleiros(Passado, Presente, Futuro),
-    writeln('\nPlantando na posição (2,3) do tabuleiro do presente:'),
-    plantarSemente(Passado, Presente, Futuro, futuro, 2, 3, 
-                NovoPassado, NovoPresente, NovoFuturo),
-
-    exibirTabuleiros(NovoPassado, NovoPresente, NovoFuturo).*/
 espacoVazio(_Ev).
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
@@ -39,6 +33,11 @@ formatar(Entrada, Saida) :-
 registrarJogadores :-
     jogador1(J1),
     jogador2(J2),
+
+    % Remove nomes antigos se existirem
+    retractall(jogador1_nome(_)),
+    retractall(jogador2_nome(_)),
+
     writeln("\nRegistro do jogadores!"),
     write("Jogador 1, digite seu nome: "),
     read_line_to_string(user_input, Nome1),
@@ -52,9 +51,12 @@ registrarJogadores :-
     assertz(jogador2_nome(Nome2Min)),
     format("Jogador 2 ficará com o ~w~n", [J2]).
 
-
 registrarJogadorUunico :-
     jogador1(J1),
+
+    % Remove nome antigo
+    retractall(jogador1_nome(_)),
+
     writeln("\nRegistro do jogador!"),
     write("Digite seu nome: "),
     read_line_to_string(user_input, Nome),
@@ -73,9 +75,12 @@ registrarJogadorUunico :-
  * @param Futuro     O tabuleiro representando o estado atual do futuro.
  */
 
-rodada(Peca, Nome, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :-
+rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :-
     jogador1(J1),
     jogador2(J2),
+
+    %% Usa o predicado auxiliar para obter o nome correto
+    nomeDoJogador(Peca, Nome),
     format("Vez do jogador: ~w (~w)~n", [Nome, Peca]),
 
     (Peca == J1 ->
@@ -97,7 +102,7 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro
     % Verifica vitória após a primeira jogada
     (verificarVitoria(NovoPassado1, NovoPresente1, NovoFuturo1, Peca) ->
         exibirTabuleiros(NovoPassado1, NovoPresente1, NovoFuturo1),
-        finalizarJogo(Peca, Nome)
+        finalizarJogo(Nome)
     ;
         true
     ),
@@ -108,7 +113,7 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro
     % Verifica vitória após a segunda jogada
     (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
         exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
-        finalizarJogo(Peca, Nome)
+        finalizarJogo(Nome)
     ;
         true
     ),
@@ -117,34 +122,24 @@ rodada(Peca, Nome, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro
     
     % Define o foco para a próxima rodada
     (
-        Peca == J1 ->
-            once((
-                definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco2, NovoFocoJ1),
-                NovoFocoJ2 = FocoJ2,
-                NovaPeca = J2,
-                NovosClonesJ1 = NovoClone2,
-                NovosClonesJ2 = ClonesJ2,
-                jogador2_nome(NovoNome),
-                writeln("chegou5")
-            ))
+        Peca == J1 -> 
+        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+        NovoFocoJ2 = FocoJ2,
+        NovaPeca = J2, 
+        NovosClonesJ1 = NovoClone2,
+        NovosClonesJ2 = CLonesJ2,
+        jogador2_nome(NovoNome)
         ;
-            once((
-                definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco2, NovoFocoJ2),
-                NovoFocoJ1 = FocoJ1,
-                NovaPeca = J1,
-                NovosClonesJ1 = ClonesJ1,
-                NovosClonesJ2 = NovoClone2,
-                jogador1_nome(NovoNome),
-                writeln("chegou6")
-            ))
+        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
+        NovoFocoJ1 = FocoJ1,
+        NovaPeca = J1,
+        NovosClonesJ1 = ClonesJ1, 
+        NovosClonesJ2 = NovoClone2,
+        jogador1_nome(NovoNome)
     ),
-    
-    
-
     writeln("Mudando para o próximo jogador."),
-
-    rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
-
+    % Alterna para o outro jogador (mantendo os focos atualizados)
+    rodada(NovaPeca, _, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
 
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirTabuleiros(Passado, Presente, Futuro),
@@ -165,12 +160,10 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
         NovoFoco = Foco  
 
     ; Escolha == 'p' ->
-        writeln("Digite a linha: "),
-        read(Linha),
-        writeln("Digite a coluna: "),
-        read(Coluna),
+        obterLinha(Linha),
+        obterColuna(Coluna),
         plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo),
-        NovoClones = Clones,
+        NovosClones = Clones,
         NovoFoco = Foco
 
     ; Escolha == 'v' ->
@@ -213,10 +206,21 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ).
 
-% Exibe a mensagem de fim de jogo
-finalizarJogo(Peca, NomeJogador) :-
-    write('Jogo encerrado! O jogador vencedor é: '),
-    write(Peca), nl,
-    format("~nFim de jogo! ~w venceu a partida!~n", [NomeJogador]),
-    write('Parabéns pela vitória!'), nl,
-    halt.
+/**
+ * Retorna o nome do jogador com base na peça.
+ *
+ * @param Peca A peça do jogador.
+ * @param Nome O nome correspondente ao jogador.
+ */
+nomeDoJogador(Peca, Nome) :-
+    jogador1(J1),
+    jogador2(J2),
+    ( Peca == J1 -> jogador1_nome(Nome)
+    ; Peca == J2 -> jogador2_nome(Nome)
+    ).
+
+finalizarJogo(NomeJogador) :-
+    format('Parabéns, ~w! Você venceu!~n', [NomeJogador]),
+    atualizarRanking(NomeJogador, 1),
+    mostrarRanking,
+    iniciarJogo.
