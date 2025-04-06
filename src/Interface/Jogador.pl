@@ -1,172 +1,169 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, removerEspacos/2]).
-
+% File: jogar.pl
+:- module(jogar, [iniciarJogo/0]).
+:- dynamic jogador1_nome/1.
+:- dynamic jogador2_nome/1.
 :- use_module('./src/Jogo/Tabuleiro.pl').
-:- use_module('./src/Utils/ImprimirTxt.pl').
+:- use_module('./src/Jogo/Movimento.pl').
+:- use_module('./src/Jogo/ControllerPlantas.pl').
+:- use_module('./src/Interface/Jogador.pl').
+
+:- use_module(library(readutil)). % para ler linha completa com read_line_to_string
+:- use_module(library(apply)).   % para maplist
+:- use_module(library(strings)). % para string_lower (se necessário)
+
+/*iniciarJogo :-
+    iniciarTabuleiros(Passado, Presente, Futuro),
+    exibirTabuleiros(Passado, Presente, Futuro),
+    writeln('\nPlantando na posição (2,3) do tabuleiro do presente:'),
+    plantarSemente(Passado, Presente, Futuro, futuro, 2, 3, 
+                NovoPassado, NovoPresente, NovoFuturo),
+
+    exibirTabuleiros(NovoPassado, NovoPresente, NovoFuturo).*/
+espacoVazio(_Ev).
+iniciarJogo :-
+    /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
+    */
+    registrarJogadores,
+    jogador1_nome(N1),
+    jogador1(J1),
+    iniciarTabuleiros(Passado, Presente, Futuro),
+    rodada(J1, N1, passado, futuro, Passado, Presente, Futuro).
+
+formatar(Entrada, Saida) :-
+    string_lower(Entrada, Lower),
+    string_chars(Lower, Chars),
+    exclude(=( ' ' ), Chars, SemEspacos),
+    string_chars(Saida, SemEspacos).
+
+registrarJogadores :-
+    jogador1(J1),
+    jogador2(J2),
+    writeln("\nRegistro do jogadores!"),
+    write("Jogador 1, digite seu nome: "),
+    read_line_to_string(user_input, Nome1),
+    formatar(Nome1, Nome1Min),
+    assertz(jogador1_nome(Nome1Min)),
+    format("Seu personagem será a ~w~n", [J1]),
+
+    write("Jogador 2, digite seu nome: "),
+    read_line_to_string(user_input, Nome2),
+    formatar(Nome2, Nome2Min),
+    assertz(jogador2_nome(Nome2Min)),
+    format("Jogador 2 ficará com o ~w~n", [J2]).
+
+
+registrarJogadorUunico :-
+    jogador1(J1),
+    writeln("\nRegistro do jogador!"),
+    write("Digite seu nome: "),
+    read_line_to_string(user_input, Nome),
+    formatar(Nome, NomeMin),
+    assertz(jogador1_nome(NomeMin)),
+    format("Seu personagem será o ~w~n", [J1]).
 
 /*
- * Define o foco do jogador para a próxima rodada.
+ * Controla a rodada do jogo, permitindo que cada jogador realize duas jogadas antes de alternar.
  *
- * @param Jogador    O símbolo do jogador que está escolhendo o foco.
+ * @param Peca       Peça do jogador atual.
+ * @param FocoJ1     Foco do jogador 1.
+ * @param FocoJ2     Foco do jogador 2.
  * @param Passado    O tabuleiro representando o estado atual do passado.
  * @param Presente   O tabuleiro representando o estado atual do presente.
  * @param Futuro     O tabuleiro representando o estado atual do futuro.
- * @param FocoAtual  O foco atual do jogador.
- * @param NovoFoco   O novo foco definido pelo jogador.
  */
-definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
-    exibirMenuFoco,
-    read_line_to_string(user_input, Entrada),
-    string_lower(Entrada, Lower),
-    removerEspacos(Lower, EntradaSemEspaco),
-    atom_string(Escolha, EntradaSemEspaco),
-    (   traduzirEscolha(Escolha, FocoTentativa) ->
-        (   focoValido(FocoTentativa, Jogador, Passado, Presente, Futuro) ->
-            NovoFoco = FocoTentativa,
-            format('~w definiu foco para: ~w~n', [Jogador, NovoFoco])
-        ;
-            writeln('Jogador não encontrado nesse tempo. Escolha outro foco.'),
-            definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
-        )
-    ;   definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
-    ).
 
+rodada(Peca, Nome, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
+    jogador1(J1),
+    jogador2(J2),
+    format("Vez do jogador: ~w (~w)~n", [Nome, Peca]),
 
-/*
- * Traduz a escolha do jogador para o respectivo foco.
- *
- * @param Escolha  Entrada do jogador ('s', 'p' ou 'f').
- * @param Foco     O foco correspondente (passado, presente ou futuro).
- */
-traduzirEscolha('s', passado).
-traduzirEscolha('p', presente).
-traduzirEscolha('f', futuro).
-traduzirEscolha(_, _) :- 
-    writeln('Opção inválida! Use s, p ou f.'),
-    fail.
+    % Determina qual foco usar nesta rodada
+    (Peca == J1 -> FocoAtual = FocoJ1 ; FocoAtual = FocoJ2),
 
-/*
- * Verifica se o foco escolhido pelo jogador é válido, ou seja, se o jogador está presente no tabuleiro correspondente.
- *
- * @param Foco     O foco escolhido (passado, presente ou futuro).
- * @param Jogador  O símbolo do jogador.
- * @param Passado  O tabuleiro representando o estado atual do passado.
- * @param Presente O tabuleiro representando o estado atual do presente.
- * @param Futuro   O tabuleiro representando o estado atual do futuro.
- * @return         Verdadeiro se o jogador estiver presente no tabuleiro correspondente, falso caso contrário.
- */
-focoValido(passado, Jogador, Passado, _, _) :- 
-    existeJogador(Passado, Jogador).
-focoValido(presente, Jogador, _, Presente, _) :- 
-    existeJogador(Presente, Jogador).
-focoValido(futuro, Jogador, _, _, Futuro) :- 
-    existeJogador(Futuro, Jogador).
+    % Verifica se o jogador está presente no foco atual
+    (focoValido(FocoAtual, Peca, Passado, Presente, Futuro) -> NovoFoco = FocoAtual;
+        writeln('Jogador não está presente nesse foco. Escolha outro.'),
+        definirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)
+    ),
 
-/*
- * Solicita ao jogador que escolha uma ação.
- *
- * @return Escolha  A ação escolhida pelo jogador: 
- *                  'm' para movimentar,
- *                  'p' para plantar,
- *                  'v' para viajar no tempo,
- *                  'r' para reiniciar o jogo.
- */
-escolherJogada(Escolha) :-
-    exibirMenuJogadas,
-    read_line_to_string(user_input, Entrada),
-    string_lower(Entrada, Lower),
-    removerEspacos(Lower, EntradaLimpa),
-    atom_string(EscolhaConvertida, EntradaLimpa),
+    % Primeira jogada
+    jogar(NovoFoco, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1),
+
+    % Verifica vitória após a primeira jogada
+    (verificarVitoria(NovoPassado1, NovoPresente1, NovoFuturo1, Peca) ->
+        exibirTabuleiros(NovoPassado1, NovoPresente1, NovoFuturo1),
+        finalizarJogo(Peca, Nome)
+    ;
+        true
+    ),
+
+    % Segunda jogada
+    jogar(NovoFoco, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2),
+
+    % Verifica vitória após a segunda jogada
+    (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
+        exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
+        finalizarJogo(Peca, Nome)
+    ;
+        true
+    ),
+
+    exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
+
+    % Define o foco para a próxima rodada
     (
-        member(EscolhaConvertida, [m, p, v, r]) ->
-            Escolha = EscolhaConvertida
+        Peca == J1 -> 
+        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+        NovoFocoJ2 = FocoJ2,
+        NovaPeca = J2,
+        jogador2_nome(NovoNome)
         ;
-            writeln("Entrada inválida! Tente novamente."),
-            escolherJogada(Escolha)
+        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
+        NovoFocoJ1 = FocoJ1,
+        NovaPeca = J1,
+        jogador1_nome(NovoNome)
+    ),
+    writeln("Mudando para o próximo jogador."),
+    % Alterna para o outro jogador (mantendo os focos atualizados)
+    rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
+
+jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo) :-
+    exibirTabuleiros(Passado, Presente, Futuro),
+
+    escolherJogada(Escolha),
+
+
+    ( Foco == passado -> Tabuleiro = Passado
+    ; Foco == presente -> Tabuleiro = Presente
+    ; Foco == futuro -> Tabuleiro = Futuro
+    ),
+
+    ( Escolha == 'm' ->
+        obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna),
+        movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, Jogador, NovoPassado, NovoPresente, NovoFuturo)
+
+    ; Escolha == 'p' ->
+        obterLinha(Linha),
+        obterColuna(Coluna),
+        plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo)
+
+    ; Escolha == 'v' ->
+        writeln("Jogada 'Viajar no tempo' ainda não implementada."),
+        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
+
+    ; Escolha == 'r' ->
+        writeln("Reiniciando o jogo..."),
+        iniciar_jogo(NovoPassado, NovoPresente, NovoFuturo)
+
+    ; % fallback
+        writeln("Escolha inválida inesperada!"),
+        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ).
 
-
-/*
- * Exibe o menu de jogadas que um jogador pode realizar.
- */
-exibirMenuJogadas :-
-    imprimirTxt('src/Interface/menus/jogadas.txt').
-
-/*
- * Exibe o menu de escolha de foco para o jogador.
- */
-exibirMenuFoco :-
-    imprimirTxt('src/Interface/menus/foco.txt').
-
-/*
- * Obtém coordenadas válidas em que o jogador está posicionado no tabuleiro.
- *
- * @param Tabuleiro O tabuleiro atual (passado, presente ou futuro).
- * @param Jogador   O símbolo do jogador.
- * @return Linha    A linha em que o jogador está localizado.
- * @return Coluna   A coluna em que o jogador está localizado.
- */
-obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
-    obterLinha(L),
-    obterColuna(C),
-    (
-        verificarPosicaoTabuleiro(Tabuleiro, L, C, Jogador) ->
-            Linha = L, Coluna = C
-    ;
-        format("Posição inválida! Insira uma posição em que a sua peça (~w) se encontre.\n", [Jogador]),
-        obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna)
-    ).
-
-/*
- * Obtém coordenadas do jogador.
- *
- * @return Linha  A linha inserida pelo jogador.
- * @return Coluna A coluna inserida pelo jogador.
- */
-/*obtemCoordenadas(Linha, Coluna) :-
-    obterLinha(Linha),
-    obterColuna(Coluna).*/
-
-
-/*
- * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
- *
- * @return Linha  A linha escolhida (de 1 a 4).
- */
- 
-obterLinha(Linha) :-
-    write("Informe a linha (1-4): "),
-    read_line_to_codes(user_input, Codes),
-    string_codes(String, Codes),
-    normalize_space(string(EntradaSemEspaco), String),
-    ( number_string(Numero, EntradaSemEspaco),
-      integer(Numero), Numero >= 1, Numero =< 4 ->
-        Linha = Numero
-    ;
-        writeln("Linha inválida! Escolha um valor entre 1 e 4."),
-        obterLinha(Linha)  % Repete até obter um valor válido
-    ).
-
-
-
-/*
- * Solicita ao jogador uma coluna válida dentro dos limites do tabuleiro.
- *
- * @return Coluna  A coluna escolhida (de 1 a 4).
- */
-obterColuna(Coluna) :-
-    write("Informe a coluna (1-4): "),
-    read_line_to_codes(user_input, Codes),
-    string_codes(String, Codes),
-    normalize_space(string(EntradaSemEspaco), String),
-    ( number_string(Numero, EntradaSemEspaco),
-      integer(Numero), Numero >= 1, Numero =< 4 ->
-        Coluna = Numero
-    ;
-        writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
-        obterColuna(Coluna)  % Repete até obter um valor válido
-    ).
-
-
-removerEspacos(Str, SemEspacos) :-
-    split_string(Str, " ", "", Lista),
-    atomic_list_concat(Lista, "", SemEspacos).
+% Exibe a mensagem de fim de jogo
+finalizarJogo(Peca, NomeJogador) :-
+    write('Jogo encerrado! O jogador vencedor é: '),
+    write(Peca), nl,
+    format("~nFim de jogo! ~w venceu a partida!~n", [NomeJogador]),
+    write('Parabéns pela vitória!'), nl,
+    halt.
