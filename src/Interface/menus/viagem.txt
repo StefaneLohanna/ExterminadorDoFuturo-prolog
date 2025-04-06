@@ -1,0 +1,10 @@
+═════════════════════════════════════════════════════════════════════════════════════════════
+Mudar de espaço temporal 
+═════════════════════════════════════════════════════════════════════════════════════════════
+    Selecione qual tabuleiro você deseja ir.
+
+    [s] Mudar para o passado
+    [p] Mudar para o presente
+    [f] Mudar para o futuro
+═════════════════════════════════════════════════════════════════════════════════════════════
+Escolha uma opção digitando o espaço temporal correspondente: 

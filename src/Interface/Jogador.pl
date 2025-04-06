@@ -1,6 +1,7 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, verificaPosicaoLivre/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, verificaPosicaoLivre/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
+:- use_module('./src/Utils/ImprimirTxt.pl').
 
 /*
  * Define o foco do jogador para a próxima rodada.
@@ -14,7 +15,10 @@
  */
 definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
     exibirMenuFoco,
-    read(Escolha),
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(Escolha, EntradaSemEspaco),
     (   traduzirEscolha(Escolha, FocoTentativa) ->
         (   focoValido(FocoTentativa, Jogador, Passado, Presente, Futuro) ->
             NovoFoco = FocoTentativa,
@@ -26,15 +30,8 @@ definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
     ;   definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ).
 
-/*
- * Exibe o menu de escolha de foco para o jogador.
- */
-exibirMenuFoco :-
-    writeln('Escolha o foco para suas próximas jogadas:'),
-    writeln('(s) Passado'),
-    writeln('(p) Presente'),
-    writeln('(f) Futuro'),
-    write('Digite sua escolha: ').
+espacoVazio(_Ev).
+
 
 /*
  * Traduz a escolha do jogador para o respectivo foco.
@@ -76,20 +73,31 @@ focoValido(futuro, Jogador, _, _, Futuro) :-
  *                  'r' para reiniciar o jogo.
  */
 escolherJogada(Escolha) :-
-    writeln("Escolha uma ação:"),
-    writeln("(m) Movimentar"),
-    writeln("(p) Plantar"),
-    writeln("(v) Viajar no tempo"),
-    writeln("(r) Reiniciar jogo"),
-    write("Digite sua escolha: "),
-    read(E),
+    exibirMenuJogadas,
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaLimpa),
+    atom_string(EscolhaConvertida, EntradaLimpa),
     (
-        member(E, [m, p, v, r]) ->
-            Escolha = E
+        member(EscolhaConvertida, [m, p, v, r]) ->
+            Escolha = EscolhaConvertida
         ;
             writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
     ).
+
+
+/*
+ * Exibe o menu de jogadas que um jogador pode realizar.
+ */
+exibirMenuJogadas :-
+    imprimirTxt('src/Interface/menus/jogadas.txt').
+
+/*
+ * Exibe o menu de escolha de foco para o jogador.
+ */
+exibirMenuFoco :-
+    imprimirTxt('src/Interface/menus/foco.txt').
 
 /*
  * Obtém coordenadas válidas em que o jogador está posicionado no tabuleiro.
@@ -120,19 +128,36 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
     obterLinha(Linha),
     obterColuna(Coluna).*/
 
+
 /*
  * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
  *
  * @return Linha  A linha escolhida (de 1 a 4).
  */
+% obterLinha(Linha) :-
+%     write("Informe a linha (1-4): "), read(L),
+%     ( integer(L), L >= 1, L =< 4 ->
+%         Linha = L
+%     ;
+%         writeln("Linha inválida! Escolha um valor entre 1 e 4."),
+%         obterLinha(Linha) % Repete até obter um valor válido
+%     ).
+
+ 
 obterLinha(Linha) :-
-    write("Informe a linha (1-4): "), read(L),
-    ( integer(L), L >= 1, L =< 4 ->
-        Linha = L
+    write("Informe a linha (1-4): "),
+    read_line_to_codes(user_input, Codes),
+    string_codes(String, Codes),
+    normalize_space(string(EntradaSemEspaco), String),
+    ( number_string(Numero, EntradaSemEspaco),
+      integer(Numero), Numero >= 1, Numero =< 4 ->
+        Linha = Numero
     ;
         writeln("Linha inválida! Escolha um valor entre 1 e 4."),
-        obterLinha(Linha) % Repete até obter um valor válido
+        obterLinha(Linha)  % Repete até obter um valor válido
     ).
+
+
 
 /*
  * Solicita ao jogador uma coluna válida dentro dos limites do tabuleiro.
@@ -140,26 +165,44 @@ obterLinha(Linha) :-
  * @return Coluna  A coluna escolhida (de 1 a 4).
  */
 obterColuna(Coluna) :-
-    write("Informe a coluna (1-4): "), read(C),
-    ( integer(C), C >= 1, C =< 4 ->
-        Coluna = C
+    write("Informe a coluna (1-4): "),
+    read_line_to_codes(user_input, Codes),
+    string_codes(String, Codes),
+    normalize_space(string(EntradaSemEspaco), String),
+    ( number_string(Numero, EntradaSemEspaco),
+      integer(Numero), Numero >= 1, Numero =< 4 ->
+        Coluna = Numero
     ;
         writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
-        obterColuna(Coluna) % Repete até obter um valor válido
+        obterColuna(Coluna)  % Repete até obter um valor válido
     ).
 
+
 escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
-    lerDirecaoValida(Direcao),
-    (
-        Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
-    ;   Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
-    ;   Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
-    ;   Direcao == d -> TempLinha is Linha, TempColuna is Coluna + 1
-    ),
-    (
-        TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
-            NovaLinha = TempLinha,
-            NovaColuna = TempColuna
+    /* Pergunta ao jogador para onde deseja mover e calcula a nova posição, garantindo que esteja nos limites.
+        
+    Args:
+        Linha: linha atual da peça.
+        Coluna: coluna atual da peça.
+        NovaLinha: linha após o movimento.
+        NovaColuna: coluna após o movimento.
+
+    Returns: a nova coordenada para que o jogador se mova.
+    */
+    writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(Direcao, EntradaSemEspaco),
+    ( Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
+    ; Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
+    ; Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
+    ; Direcao == d -> TempLinha is Linha, TempColuna is Coluna + 1
+    ; writeln("Direção inválida! Use apenas w, a, s ou d."),
+      escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
+    ), 
+    ( TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
+        NovaLinha = TempLinha, NovaColuna = TempColuna
     ;
         writeln("Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro."),
         escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
@@ -225,5 +268,6 @@ stringParaFoco("passado", passado).
 stringParaFoco("presente", presente).
 stringParaFoco("futuro", futuro).
 
-
-
+removerEspacos(Str, SemEspacos) :-
+    split_string(Str, " ", "", Lista),
+    atomic_list_concat(Lista, "", SemEspacos).
