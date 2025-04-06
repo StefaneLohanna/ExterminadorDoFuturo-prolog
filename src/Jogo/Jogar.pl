@@ -108,7 +108,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
     ),
 
     % Segunda jogada
-    jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, NovoFoco2),
+    jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _),
 
     % Verifica vitória após a segunda jogada
     (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
@@ -127,7 +127,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
         NovoFocoJ2 = FocoJ2,
         NovaPeca = J2, 
         NovosClonesJ1 = NovoClone2,
-        NovosClonesJ2 = CLonesJ2,
+        NovosClonesJ2 = ClonesJ2,
         jogador2_nome(NovoNome)
         ;
         definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
@@ -139,7 +139,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
     ),
     writeln("Mudando para o próximo jogador."),
     % Alterna para o outro jogador (mantendo os focos atualizados)
-    rodada(NovaPeca, _, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
+    rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
 
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirTabuleiros(Passado, Presente, Futuro),
@@ -163,7 +163,7 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
         obterLinha(Linha),
         obterColuna(Coluna),
         plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo),
-        NovosClones = Clones,
+        NovoClones = Clones,
         NovoFoco = Foco
 
     ; Escolha == 'v' ->
