@@ -143,10 +143,8 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
         movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, Jogador, NovoPassado, NovoPresente, NovoFuturo)
 
     ; Escolha == 'p' ->
-        writeln("Digite a linha: "),
-        read(Linha),
-        writeln("Digite a coluna: "),
-        read(Coluna),
+        obterLinha(Linha),
+        obterColuna(Coluna),
         plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo)
 
     ; Escolha == 'v' ->
