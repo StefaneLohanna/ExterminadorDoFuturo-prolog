@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificarMatriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, modificarMatriz/5, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/4]).
 
 %  Definindo os emojis dos jogadores
 espacoVazio('\x1F533'). 
@@ -363,3 +363,21 @@ plantaCerta(Planta, Elemento) :- Planta = Elemento.
 existeJogador(Tabuleiro, Jogador) :-
     member(Linha, Tabuleiro),
     member(Jogador, Linha).
+
+% Verifica se o jogador atual venceu o jogo
+verificarVitoria(Passado, Presente, Futuro, JogadorAtual) :-
+    % Determina o adversário
+    jogador1(Jogador1),
+    jogador2(Jogador2),
+    (JogadorAtual = Jogador1 -> Adversario = Jogador2 ; Adversario = Jogador1),
+    
+    % Verifica em quais tabuleiros o adversário está presente
+    (existeJogador(Passado, Adversario) -> PresenteNoPassado = 1 ; PresenteNoPassado = 0),
+    (existeJogador(Presente, Adversario) -> PresenteNoPresente = 1 ; PresenteNoPresente = 0),
+    (existeJogador(Futuro, Adversario) -> PresenteNoFuturo = 1 ; PresenteNoFuturo = 0),
+
+    % Soma o total de tabuleiros onde o adversário está presente
+    Soma is PresenteNoPassado + PresenteNoPresente + PresenteNoFuturo,
+
+    % Se o adversário está em apenas um tabuleiro, o jogador atual vence
+    Soma =:= 1.
