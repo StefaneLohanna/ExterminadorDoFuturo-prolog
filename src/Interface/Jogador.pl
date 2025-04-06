@@ -16,7 +16,8 @@
 definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
     exibirMenuFoco,
     read_line_to_string(user_input, Entrada),
-    removerEspacos(Entrada, EntradaSemEspaco),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
     atom_string(Escolha, EntradaSemEspaco),
     (   traduzirEscolha(Escolha, FocoTentativa) ->
         (   focoValido(FocoTentativa, Jogador, Passado, Presente, Futuro) ->
@@ -72,7 +73,8 @@ focoValido(futuro, Jogador, _, _, Futuro) :-
 escolherJogada(Escolha) :-
     exibirMenuJogadas,
     read_line_to_string(user_input, Entrada),
-    removerEspacos(Entrada, EntradaLimpa),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaLimpa),
     atom_string(EscolhaConvertida, EntradaLimpa),
     (
         member(EscolhaConvertida, [m, p, v, r]) ->
