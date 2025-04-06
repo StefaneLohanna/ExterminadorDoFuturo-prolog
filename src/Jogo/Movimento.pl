@@ -70,7 +70,8 @@ escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
     */
     writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
     read_line_to_string(user_input, Entrada),
-    removerEspacos(Entrada, EntradaSemEspaco),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
     atom_string(Direcao, EntradaSemEspaco),
     ( Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
     ; Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
