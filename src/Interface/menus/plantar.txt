@@ -1,0 +1,8 @@
+═════════════════════════════════════════════════════════════════════════════════════════════
+Escolher Local para plantar semente
+═════════════════════════════════════════════════════════════════════════════════════════════
+    Selecione para qual direção deseja plantar.
+
+    [w] plantar para cima           [a] plantar para a esquerda
+    [s] plantar para baixo          [d] plantar para a direita
+═════════════════════════════════════════════════════════════════════════════════════════════

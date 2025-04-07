@@ -105,11 +105,19 @@ escolherOpcaoMenu(EscolhaFinal) :-
         escolherOpcaoMenu(EscolhaFinal)
     ).
 
+
 exibirOpcaoMenu(Opcao) :-
     ( 
         Opcao == r ->
         mostrarRanking
     ;   
+
+        Opcao == d ->
+        exibirDetalhamento
+    ;
+        Opcao == m ->
+        exibirModoJogo
+    ;
         Opcao == j ->
         true
     ;
@@ -119,21 +127,31 @@ exibirOpcaoMenu(Opcao) :-
     ).
 
 
-
-
-
-
+exibirMenuJogadas :-
 /*
  * Exibe o menu de jogadas que um jogador pode realizar.
  */
-exibirMenuJogadas :-
     imprimirTxt('src/Interface/menus/jogadas.txt').
 
+
+exibirMenuFoco :-
 /*
  * Exibe o menu de escolha de foco para o jogador.
  */
-exibirMenuFoco :-
     imprimirTxt('src/Interface/menus/foco.txt').
+
+exibirModoJogo :-
+/*
+ * Exibe o menu de modos de jogar.
+ */
+    imprimirTxt('src/Interface/textosDeExibicao/modoDeJogo.txt').
+
+exibirDetalhamento :-
+/*
+ * Exibe o menu do detalhamento de jogo.
+ */
+    imprimirTxt('src/Interface/textosDeExibicao/detalhamentoJogo.txt').
+
 
 /*
  * Obtém coordenadas válidas em que o jogador está posicionado no tabuleiro.
@@ -254,8 +272,6 @@ lerDirecaoValida(Direcao) :-
         lerDirecaoValida(Direcao)
     ).
     
-
-
 /*
  * Obtém coordenadas de origem válidas para o jogador, ou seja,
  * verifica se existe uma peça do jogador naquela posição.
