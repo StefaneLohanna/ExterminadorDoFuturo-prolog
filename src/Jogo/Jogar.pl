@@ -1,5 +1,11 @@
 :- module(jogar, [iniciarJogo/0]).
 
+
+:- use_module(library(readutil)). % para ler linha completa com read_line_to_string
+:- use_module(library(apply)).   % para maplist
+:- use_module(library(strings)). % para string_lower (se necessário)
+:- use_module(library(system)).
+
 :- dynamic jogador1_nome/1.
 :- dynamic jogador2_nome/1.
 
@@ -8,20 +14,18 @@
 :- use_module('./src/Jogo/ControllerPlantas.pl').
 :- use_module('./src/Interface/Jogador.pl').
 :- use_module('./src/Utils/Ranking.pl').
-
-:- use_module(library(readutil)). % para ler linha completa com read_line_to_string
-:- use_module(library(apply)).   % para maplist
-:- use_module(library(strings)). % para string_lower (se necessário)
+:- use_module('./src/Utils/Bot.pl').
 
 espacoVazio(_Ev).
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
     */
-    registrarJogadores,
+    escolherModoDeJogo(Modo),
+    (Modo == 'a' -> registrarJogadorUnico ; registrarJogadores),
     jogador1_nome(N1),
     jogador1(J1),
     iniciarTabuleiros(Passado, Presente, Futuro),
-    rodada(J1, N1, passado, futuro, Passado, Presente, Futuro).
+    rodada(J1, N1, passado, futuro, Passado, Presente, Futuro, Modo).
 
 formatar(Entrada, Saida) :-
     string_lower(Entrada, Lower),
@@ -50,7 +54,7 @@ registrarJogadores :-
     assertz(jogador2_nome(Nome2Min)),
     format("Jogador 2 ficará com o ~w~n", [J2]).
 
-registrarJogadorUunico :-
+registrarJogadorUnico :-
     jogador1(J1),
 
     % Remove nome antigo
@@ -61,7 +65,10 @@ registrarJogadorUunico :-
     read_line_to_string(user_input, Nome),
     formatar(Nome, NomeMin),
     assertz(jogador1_nome(NomeMin)),
-    format("Seu personagem será o ~w~n", [J1]).
+    format("Seu personagem será o ~w~n", [J1]),
+    assertz(jogador2_nome('bot')).
+
+
 
 /*
  * Controla a rodada do jogo, permitindo que cada jogador realize duas jogadas antes de alternar.
@@ -74,7 +81,7 @@ registrarJogadorUunico :-
  * @param Futuro     O tabuleiro representando o estado atual do futuro.
  */
 
-rodada(Peca, _, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
+rodada(Peca, _, FocoJ1, FocoJ2, Passado, Presente, Futuro, Modo) :-
     jogador1(J1),
     jogador2(J2),
 
@@ -92,7 +99,9 @@ rodada(Peca, _, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
     ),
 
     % Primeira jogada
-    jogar(NovoFoco, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1),
+    (Modo == 'a', Nome == 'bot' -> jogarBot(NovoFoco, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1)
+    ;
+    jogar(NovoFoco, Peca, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1)),
 
     % Verifica vitória após a primeira jogada
     (verificarVitoria(NovoPassado1, NovoPresente1, NovoFuturo1, Peca) ->
@@ -103,7 +112,10 @@ rodada(Peca, _, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
     ),
 
     % Segunda jogada
-    jogar(NovoFoco, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2),
+    (Modo == 'a', Nome == 'bot' -> jogarBot(NovoFoco, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2)
+    ;
+    jogar(NovoFoco, Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2)),
+    
 
     % Verifica vitória após a segunda jogada
     (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
@@ -116,23 +128,35 @@ rodada(Peca, _, FocoJ1, FocoJ2, Passado, Presente, Futuro) :-
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
 
     % Define o foco para a próxima rodada
-    (
-        Peca == J1 -> 
-        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
-        NovoFocoJ2 = FocoJ2,
-        NovaPeca = J2
+    (Modo == 'a' ->
+        (Peca == J1 -> 
+            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+            NovoFocoJ2 = FocoJ2,
+            NovaPeca = J2
+            ;
+            escolherTempoBot(NovoFoco, NovoFocoJ2),
+            NovoFocoJ1 = FocoJ1,
+            NovaPeca = J1,
+            format("Foco escolhido pelo Bot: ~w~n", [NovoFocoJ2])
+        )
         ;
-        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
-        NovoFocoJ1 = FocoJ1,
-        NovaPeca = J1
+        (
+            Peca == J1 -> 
+            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+            NovoFocoJ2 = FocoJ2,
+            NovaPeca = J2
+            ;
+            definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
+            NovoFocoJ1 = FocoJ1,
+            NovaPeca = J1
+        )
     ),
     writeln("Mudando para o próximo jogador..."),
     % Chama a próxima rodada passando '_' no nome, pois ele será resolvido dentro da rodada
-    rodada(NovaPeca, _, NovoFocoJ1, NovoFocoJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
+    rodada(NovaPeca, _, NovoFocoJ1, NovoFocoJ2, NovoPassado2, NovoPresente2, NovoFuturo2, Modo).
 
 jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo) :-
     exibirTabuleiros(Passado, Presente, Futuro),
-
     escolherJogada(Escolha),
 
 
@@ -140,14 +164,12 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
     ; Foco == presente -> Tabuleiro = Presente
     ; Foco == futuro -> Tabuleiro = Futuro
     ),
+    obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna),
 
     ( Escolha == 'm' ->
-        obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna),
         movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, Jogador, NovoPassado, NovoPresente, NovoFuturo)
 
     ; Escolha == 'p' ->
-        obterLinha(Linha),
-        obterColuna(Coluna),
         plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo)
 
     ; Escolha == 'v' ->
@@ -163,6 +185,36 @@ jogar(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoF
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ).
 
+jogarBot(Foco, Jogador, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo) :-
+    exibirTabuleiros(Passado, Presente, Futuro),
+    escolherJogadaBot(Escolha),
+    sleep(1),
+
+    ( Foco == passado -> Tabuleiro = Passado
+    ; Foco == presente -> Tabuleiro = Presente
+    ; Foco == futuro -> Tabuleiro = Futuro
+    ),
+    obtemCoordenadasValidasBot(Tabuleiro, Jogador, Linha, Coluna, LinhaDestino, ColunaDestino),
+    format("Jogada Escolhida pelo bot: ~w (~w, ~w)~n", [Escolha, LinhaDestino, ColunaDestino]),
+    sleep(1),
+    ( Escolha == 'm' ->
+        movimentoBot(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, LinhaDestino, ColunaDestino, Jogador, NovoPassado, NovoPresente, NovoFuturo)
+
+    ; Escolha == 'p' ->
+        plantarSementeBot(Passado, Presente, Futuro, Foco, LinhaDestino, ColunaDestino, NovoPassado, NovoPresente, NovoFuturo)
+
+    ; Escolha == 'v' ->
+        writeln("Jogada 'Viajar no tempo' ainda não implementada."),
+        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
+
+    ; Escolha == 'r' ->
+        writeln("Reiniciando o jogo..."),
+        iniciar_jogo(NovoPassado, NovoPresente, NovoFuturo)
+
+    ; % fallback
+        writeln("Escolha inválida inesperada!"),
+        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
+).
 /**
  * Retorna o nome do jogador com base na peça.
  *

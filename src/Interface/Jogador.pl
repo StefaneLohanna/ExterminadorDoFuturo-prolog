@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, removerEspacos/2]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, removerEspacos/2, escolherModoDeJogo/1]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
@@ -132,14 +132,14 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
  *
  * @return Linha  A linha escolhida (de 1 a 4).
  */
- 
+
 obterLinha(Linha) :-
     write("Informe a linha (1-4): "),
     read_line_to_codes(user_input, Codes),
     string_codes(String, Codes),
     normalize_space(string(EntradaSemEspaco), String),
     ( number_string(Numero, EntradaSemEspaco),
-      integer(Numero), Numero >= 1, Numero =< 4 ->
+        integer(Numero), Numero >= 1, Numero =< 4 ->
         Linha = Numero
     ;
         writeln("Linha inválida! Escolha um valor entre 1 e 4."),
@@ -159,7 +159,7 @@ obterColuna(Coluna) :-
     string_codes(String, Codes),
     normalize_space(string(EntradaSemEspaco), String),
     ( number_string(Numero, EntradaSemEspaco),
-      integer(Numero), Numero >= 1, Numero =< 4 ->
+        integer(Numero), Numero >= 1, Numero =< 4 ->
         Coluna = Numero
     ;
         writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
@@ -170,3 +170,17 @@ obterColuna(Coluna) :-
 removerEspacos(Str, SemEspacos) :-
     split_string(Str, " ", "", Lista),
     atomic_list_concat(Lista, "", SemEspacos).
+
+escolherModoDeJogo(Escolha):-
+    imprimirTxt('src/Interface/menus/escolherModoDeJogo.txt'),
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaLimpa),
+    atom_string(EscolhaConvertida, EntradaLimpa),
+    (
+        member(EscolhaConvertida, [a, d]) ->
+            Escolha = EscolhaConvertida
+        ;
+            writeln("Entrada inválida! Tente novamente."),
+            escolherModoDeJogo(Escolha)
+    ).
