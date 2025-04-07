@@ -13,8 +13,6 @@ chmod +x run.sh && ./run.sh
 Projeto desenvolvido com foco na programação lógica, utilizando Prolog, para a disciplina Paradigmas de Linguagem de Programação da Universidade Federal de Campina Grande (UFCG).
 
 
-<img src=".github/layout.png" alt="Visual do projeto" width="100%">
-
 ## 🎮 Descrição 
 Trata-se da implementação lógica de um jogo de tabuleiro interativo em terminal, baseado no board game *That Time You Killed Me*, em que dois jogadores disputam pelo reconhecimento da criação da máquina do tempo.
 
