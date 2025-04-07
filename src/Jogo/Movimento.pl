@@ -40,4 +40,3 @@ movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, NovaLinha, 
     ; Foco == presente -> (NovoPassado = TempPassado, NovoPresente = TabuleiroAtualizado, NovoFuturo = TempFuturo)
     ; Foco == futuro -> (NovoPassado = TempPassado, NovoPresente = TempPresente, NovoFuturo = TabuleiroAtualizado)
     ).
-    

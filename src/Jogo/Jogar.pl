@@ -35,12 +35,21 @@ iniciarJogo :-
     ).
 
 formatar(Entrada, Saida) :-
+/*
+Converte para minúsculo e remove os espaços em branco
+
+@param Entrada String original a ser formatada
+@param Saida Resultado da formatação da string
+*/
     string_lower(Entrada, Lower),
     string_chars(Lower, Chars),
     exclude(=( ' ' ), Chars, SemEspacos),
     string_chars(Saida, SemEspacos).
 
 registrarJogadores :-
+/* 
+Realiza o registro dos jogadores
+*/
     jogador1(J1),
     jogador2(J2),
 
@@ -52,7 +61,7 @@ registrarJogadores :-
     write("Jogador 1, digite seu nome: "),
     read_line_to_string(user_input, Nome1),
     formatar(Nome1, Nome1Min),
-    assertz(jogador1_nome(Nome1Min)),
+    assertz(jogador1_nome(Nome1Min)), %armazena os nomes como fatos dinamicos (jogador1_nome, jogador2_nome)
     format("Seu personagem será a ~w~n", [J1]),
 
     write("Jogador 2, digite seu nome: "),
@@ -62,6 +71,9 @@ registrarJogadores :-
     format("Jogador 2 ficará com o ~w~n", [J2]).
 
 registrarJogadorUunico :-
+/* 
+Realiza o registro do jogador que jogará contra o bot
+*/
     jogador1(J1),
 
     % Remove nome antigo
