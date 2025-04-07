@@ -18,8 +18,8 @@ Trata-se da implementação lógica de um jogo de tabuleiro interativo em termin
 
 ## ⚙️ Executar o projeto
 Para executar o projeto, siga os seguintes passos:
-1. Instale e assegure-se de que o stack está funcionando em sua máquina
-   - [Guia de instalação do stack](https://www.swi-prolog.org/Download.html)
+1. Instale e assegure-se de que o SWI‑Prolog está funcionando em sua máquina
+   - [Guia de instalação](https://www.swi-prolog.org/Download.html)
   
 2. Clone este repositório em sua máquina
     ```
