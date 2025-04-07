@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/4, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7, verificaPosicaoLivre/4, negado/1]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/4, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7, verificaPosicaoLivre/4, negado/1, exclamacao/1, caveira/1]).
 
 %  Definindo os emojis dos jogadores
 espacoVazio('\x1F533'). 
@@ -252,6 +252,7 @@ empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino
     espacoVazio(Ev),
     arbusto(Arbusto),
     arvore(Arvore),
+    caveira(Caveira),
 
     % Pega peça ocupante na posição de destino
     nth1(LinhaDestino, TabuleiroAntigo, LinhaDestinoLista),
@@ -286,7 +287,8 @@ empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino
             moverSimples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
         )
     ;
-        writeln("Jogador morreu!"),
+    format("~w Jogador morreu!~n", [Caveira]),
+        %writeln("Jogador morreu!"),
         removerPeca(TabuleiroAntigo, LinhaDestino, ColunaDestino, TabuleiroIntermediario),
         moverSimples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
     ).

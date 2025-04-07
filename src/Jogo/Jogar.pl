@@ -100,6 +100,7 @@ Realiza o registro do jogador que jogará contra o bot
 rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :-
     jogador1(J1),
     jogador2(J2),
+    exclamacao(Exclamacao),
     %% Usa o predicado auxiliar para obter o nome correto
     nomeDoJogador(Peca, Nome),
     format("Vez do jogador: ~w (~w)~n", [Nome, Peca]),
@@ -113,8 +114,8 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
 
     % Verifica se o jogador está presente no foco atual
     (focoValido(FocoAtual, Peca, Passado, Presente, Futuro) -> NovoFoco = FocoAtual;
-        %format("~w Jogador não está presente nesse foco. Escolha outro. ~n", [Exclamacao]),
-        writeln('Jogador não está presente nesse foco. Escolha outro.'),
+        format("~w Jogador não está presente nesse foco. Escolha outro. ~n", [Exclamacao]),
+        %writeln('Jogador não está presente nesse foco. Escolha outro.'),
         definirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ),
 
@@ -165,6 +166,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
 
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirTabuleiros(Passado, Presente, Futuro),
+    negado(Negado),
     escolherJogada(Escolha),
 
 
@@ -194,7 +196,8 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
     defineViagem(Foco, Clones, TempoEscolhido, Resultado),
     (
         Resultado == "viagem impossível" ->
-            writeln("Viagem impossível. Tente outra jogada."),
+            format("~w Viagem impossível. Tente outra jogada.~n", [Negado]),
+            %writeln("Viagem impossível. Tente outra jogada."),
             jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
                     NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
 
@@ -212,7 +215,8 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
                            NovoPassado, NovoPresente, NovoFuturo, NovoClones),
                     stringParaFoco(TempoEscolhido, NovoFoco)
                 ;
-                    writeln("A posição no tempo de destino já está ocupada. Tente outra jogada."),
+                    format("~w A posição no tempo de destino já está ocupada. Tente outra jogada.~n", [Negado]),
+                    %writeln("A posição no tempo de destino já está ocupada. Tente outra jogada."),
                     jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
                         NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
 
@@ -224,7 +228,8 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
         writeln("Reiniciando o jogo..."),
         iniciarJogo
     ; % fallback
-        writeln("Escolha inválida inesperada!"),
+        format("~w Escolha inválida inesperada!~n", [Negado]),
+        %writeln("Escolha inválida inesperada!"),
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ).
 

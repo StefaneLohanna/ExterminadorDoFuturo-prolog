@@ -42,7 +42,9 @@ traduzirEscolha('s', passado).
 traduzirEscolha('p', presente).
 traduzirEscolha('f', futuro).
 traduzirEscolha(_, _) :- 
-    writeln('Opção inválida! Use s, p ou f.'),
+    negado(Negado),
+    format("~w Opção inválida! Use s, p ou f.~n", [Negado]),
+    %writeln('Opção inválida! Use s, p ou f.'),
     fail.
 
 /*
@@ -73,6 +75,7 @@ focoValido(futuro, Jogador, _, _, Futuro) :-
  */
 escolherJogada(Escolha) :-
     exibirMenuJogadas,
+    negado(Negado),
     read_line_to_string(user_input, Entrada),
     string_lower(Entrada, Lower),
     removerEspacos(Lower, EntradaSemEspaco),
@@ -81,7 +84,8 @@ escolherJogada(Escolha) :-
         member(EscolhaConvertida, [m, p, v, r]) ->
             Escolha = EscolhaConvertida
         ;
-            writeln("Entrada inválida! Tente novamente."),
+            format("~w Entrada inválida! Tente novamente.~n", [Negado]),
+            %writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
     ).
 
@@ -193,12 +197,13 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
 %     ( integer(L), L >= 1, L =< 4 ->
 %         Linha = L
 %     ;
-%         writeln("Linha inválida! Escolha um valor entre 1 e 4."),
+%         %writeln("Linha inválida! Escolha um valor entre 1 e 4."),
 %         obterLinha(Linha) % Repete até obter um valor válido
 %     ).
 
  
 obterLinha(Linha) :-
+    negado(Negado),
     write("Informe a linha (1-4): "),
     read_line_to_codes(user_input, Codes),
     string_codes(String, Codes),
@@ -207,7 +212,8 @@ obterLinha(Linha) :-
       integer(Numero), Numero >= 1, Numero =< 4 ->
         Linha = Numero
     ;
-        writeln("Linha inválida! Escolha um valor entre 1 e 4."),
+        format("~w Linha inválida! Escolha um valor entre 1 e 4.~n", [Negado]),
+         %writeln("Linha inválida! Escolha um valor entre 1 e 4."),
         obterLinha(Linha)  % Repete até obter um valor válido
     ).
 
@@ -219,6 +225,7 @@ obterLinha(Linha) :-
  * @return Coluna  A coluna escolhida (de 1 a 4).
  */
 obterColuna(Coluna) :-
+    negado(Negado),
     write("Informe a coluna (1-4): "),
     read_line_to_codes(user_input, Codes),
     string_codes(String, Codes),
@@ -227,7 +234,8 @@ obterColuna(Coluna) :-
       integer(Numero), Numero >= 1, Numero =< 4 ->
         Coluna = Numero
     ;
-        writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
+        format("~w Coluna inválida! Escolha um valor entre 1 e 4.~n", [Negado]),
+        %writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
         obterColuna(Coluna)  % Repete até obter um valor válido
     ).
 
@@ -243,6 +251,7 @@ escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
 
     Returns: a nova coordenada para que o jogador se mova.
     */
+    negado(Negado),
     writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
     read_line_to_string(user_input, Entrada),
     string_lower(Entrada, Lower),
@@ -252,23 +261,26 @@ escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
     ; Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
     ; Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
     ; Direcao == d -> TempLinha is Linha, TempColuna is Coluna + 1
-    ; writeln("Direção inválida! Use apenas w, a, s ou d."),
+    ; format("~w Direção inválida! Use apenas w, a, s ou d.", [Negado]),
+    %writeln("Direção inválida! Use apenas w, a, s ou d."),
       escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
     ), 
     ( TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
         NovaLinha = TempLinha, NovaColuna = TempColuna
     ;
-        writeln("Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro."),
+        format("~w Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro.", [Negado]),
+        %writeln("Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro."),
         escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
     ).
 
 lerDirecaoValida(Direcao) :-
+    negado(Negado),
     writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
     read(Input),
     ( member(Input, [w, a, s, d]) ->
         Direcao = Input
     ;
-        writeln("Direção inválida! Use apenas w, a, s ou d."),
+        format("~w Direção inválida! Use apenas w, a, s ou d.", [Negado]),
         lerDirecaoValida(Direcao)
     ).
     
