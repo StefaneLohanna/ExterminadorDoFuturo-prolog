@@ -113,13 +113,29 @@ verificarPosicaoTabuleiro(Tabuleiro, Linha, Coluna, PecaEsperada) :-
 
 
 replace(Index, List, NewElement, NewList) :-
-    /* Troca os elementos.
-    */ 
+/*
+ * Troca um elemento em uma lista pelo novo elemento especificado.
+ * 
+ * @param Index Posição do elemento a ser substituído.
+ * @param List Lista original onde será feita a substituição.
+ * @param NewElement Novo elemento que substituirá o aquele existente na posição Index.
+ * @param NewList Lista resultante após a substituição do elemento.
+ * 
+ * @throws Falha se o Index estiver fora dos limites da lista.
+ */
     nth1(Index, List, _, Rest),
     nth1(Index, NewList, NewElement, Rest).
 
 
 removerPeca(Tabuleiro, Linha, Coluna, TabuleiroAtualizado) :-
+/*
+ * Remove uma peça do tabuleiro na posição especificada, substituindo-a por um espaço vazio.
+ * 
+ * @param Tabuleiro Tabuleiro atual onde a peça será removida.
+ * @param Linha Linha da posição onde a peça será removida.
+ * @param Coluna Coluna da posição onde a peça será removida.
+ * @param TabuleiroAtualizado Tabuleiro resultante após a remoção da peça.
+ */
     espacoVazio(Ev),
     nth1(Linha, Tabuleiro, LinhaLista),
     replace(Coluna, LinhaLista, Ev, NovaLinha),
@@ -140,6 +156,16 @@ removerPlanta(Tabuleiro, Planta, Linha, Coluna, TabuleiroAtualizado) :-
     ).
 
 moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
+/* Efetua o movimento do jogador com as coordenadas já escolhidas, de acordo com o couteúdo da célula de destino.
+
+ * @param TabuleiroAntigo Tabuleiro antes do movimento.
+ * @param LinhaOrigem Linha atual da peça a ser movida.
+ * @param ColunaOrigem Coluna atual da peça a ser movida.
+ * @param LinhaDestino Linha de destino do movimento.
+ * @param ColunaDestino Coluna de destino do movimento.
+ * @param Peca Peça que está sendo movida.
+ * @param TabuleiroAtualizado Tabuleiro resultante após o movimento.
+ */
     espacoVazio(Ev),
     arbusto(Arbusto),
     semente(Semente),
@@ -168,19 +194,16 @@ moverPeca(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestin
     ).
 
 moverSimples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Peca, TabuleiroAtualizado) :-
-    /* Move a Peca com base na linha e a coluna.
+/* Efetua o movimento do jogador com as coordenadas já escolhidas, assumindo que não há elementos diferentes do espaço vazio.
 
-    Args: 
-        TabuleiroAntigo: tabuleiro original que vai ser atualizado. 
-        LinhaOrigem: linha onde a peca estava anteriormente. 
-        ColunaOrigem: coluna onde a peça estava anteriormente. 
-        LinhaDestino: linha de destino da peça. 
-        ColunaDestino: coluna de destino da peça. 
-        Peca: peça do jogador atual em questão. 
-    
-    Returns: 
-        TabuleiroAtualizado: tabuleiro depois que a peça se moveu.
-    */
+ * @param TabuleiroAntigo Tabuleiro antes do movimento.
+ * @param LinhaOrigem Linha atual da peça a ser movida.
+ * @param ColunaOrigem Coluna atual da peça a ser movida.
+ * @param LinhaDestino Linha de destino do movimento.
+ * @param ColunaDestino Coluna de destino do movimento.
+ * @param Peca Peça que está sendo movida.
+ * @param TabuleiroAtualizado Tabuleiro resultante após o movimento.
+ */
     espacoVazio(Ev),
     nth1(LinhaOrigem, TabuleiroAntigo, LinhaOrigemLista),
     replace(ColunaOrigem, LinhaOrigemLista, Ev, NovaLinhaOrigem),
@@ -190,8 +213,17 @@ moverSimples(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDes
     replace(LinhaDestino, TabuleiroIntermediario, NovaLinhaDestino, TabuleiroAtualizado).
 
 
-% Calcula a próxima posição na direção do empurrão, e verifica os limites do tabuleiro.
 calculaPosicaoDestino(LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Tabuleiro, NovaLinha, NovaColuna) :-
+/* Calcula a próxima posição na direção do empurrão, e verifica os limites do tabuleiro.
+
+ * @param LinhaOrigem Linha atual da peça a ser movida.
+ * @param ColunaOrigem Coluna atual da peça a ser movida.
+ * @param LinhaDestino Linha de destino do movimento.
+ * @param ColunaDestino Coluna de destino do movimento.
+ * @param Tabuleiro Tabuleiro onde ocorre o movimento.
+ * @param NovaLinha Linha resultante após o deslocamento na direção do movimento.
+ * @param NovaColuna Coluna resultante após o deslocamento na direção do movimento.
+ */
     DirecaoLinha is LinhaDestino - LinhaOrigem,
     DirecaoColuna is ColunaDestino - ColunaOrigem,
     NovaLinha is LinhaDestino + DirecaoLinha,
@@ -207,6 +239,17 @@ calculaPosicaoDestino(LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Ta
 
 
 empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, Empurrado, TabuleiroAtualizado) :- 
+/* Executa o empurrão de uma peça ocupante em uma direção/célula específica, a depender do contexto (paradoxo, colisões com arbutos ou árvores e de forma encadeada)
+
+ * @param TabuleiroAntigo Tabuleiro antes do movimento.
+ * @param LinhaOrigem Linha atual da peça a ser movida.
+ * @param ColunaOrigem Coluna atual da peça a ser movida.
+ * @param LinhaDestino Linha de destino do movimento.
+ * @param ColunaDestino Coluna de destino do movimento.
+ * @param Jogador Jogador que está realizando o empurrão.
+ * @param Empurrado Peça que está sendo empurrada.
+ * @param TabuleiroAtualizado Tabuleiro resultante após o empurrão.
+ */
     espacoVazio(Ev),
     arbusto(Arbusto),
     arvore(Arvore),
@@ -251,6 +294,19 @@ empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino
 
 
 paradoxo(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmpurrado, NovaLinha, NovaColuna, JogadorEmpurrador, TabuleiroAtualizado) :-
+/* Caso da morte por paradoxo: elimina ambas as peças
+
+ * @param TabuleiroAntigo Tabuleiro antes do paradoxo.
+ * @param LinhaEmpurrador Linha original do jogador que está empurrando.
+ * @param ColunaEmpurrador Coluna original do jogador que está empurrando.
+ * @param LinhaEmpurrado Linha do jogador que está sendo empurrado.
+ * @param ColunaEmpurrado Coluna do jogador que está sendo empurrado.
+ * @param NovaLinha Linha onde o jogador empurrado também está (causando o paradoxo).
+ * @param NovaColuna Coluna onde o jogador empurrado também está (causando o paradoxo).
+ * @param JogadorEmpurrador Peça do jogador que está realizou o empurrão.
+ * @param TabuleiroAtualizado Tabuleiro resultante após o paradoxo.
+ */    
+    
     espacoVazio(Ev),
 
     % Remove a peça empurrada
@@ -271,6 +327,15 @@ paradoxo(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmp
 
 
 mortePorArbusto(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmpurrado, JogadorEmpurrador, TabuleiroAtualizado) :-
+/* Caso da morte por arbusto: elimina o jogador que foi para a célula em que há um arbusto
+
+ * @param TabuleiroAntigo Tabuleiro antes do empurrão.
+ * @param LinhaEmpurrador Linha original do jogador que está empurrando.
+ * @param ColunaEmpurrador Coluna original do jogador que está empurrando.
+ * @param LinhaEmpurrado Linha do jogador que está sendo empurrado.
+ * @param ColunaEmpurrado Coluna do jogador que está sendo empurrado.
+ * @param TabuleiroAtualizado Tabuleiro resultante após o empurrão para a planta.
+ */  
     espacoVazio(Ev),
     % Remove a peça empurrada
     removerPeca(Tabuleiro, LinhaEmpurrado, ColunaEmpurrado, TabuleiroSemEmpurrado),
@@ -287,6 +352,18 @@ mortePorArbusto(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, Co
 
 
 arvoreCai(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmpurrado, NovaLinha, NovaColuna, JogadorEmpurrador, TabuleiroAtualizado) :-
+/* Caso onde um jogador empurra uma árvore
+
+ * @param TabuleiroAntigo Tabuleiro antes do empurrão.
+ * @param LinhaEmpurrador Linha original do jogador que está empurrando.
+ * @param ColunaEmpurrador Coluna original do jogador que está empurrando.
+ * @param LinhaEmpurrado Linha do jogador que está sendo empurrado.
+ * @param ColunaEmpurrado Coluna do jogador que está sendo empurrado.
+ * @param NovaLinha Linha onde a árvore cairá após o empurrão.
+ * @param NovaColuna Coluna onde a árvore cairá após o empurrão.
+ * @param JogadorEmpurrador Peça do jogador que está realizou o empurrão.
+ * @param TabuleiroAtualizado Tabuleiro resultante após a queda da árvore.
+ */  
     espacoVazio(Ev),
     arbusto(Arbusto),
     semente(Semente),
@@ -319,6 +396,20 @@ arvoreCai(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEm
 
 
 empurraArvore(Tabuleiro, LinhaEmpurrador, ColunaEmpurrador, LinhaEmpurrado, ColunaEmpurrado,NovaLinha, NovaColuna, JogadorEmpurrador, JogadorEmpurrado, TabuleiroAtualizado) :- 
+/* Caso onde uma árvore cai, após um jogador empurrar outro para a célula que continha uma árvore, e podendo matar um jogador na casa adjacente a da árvore
+
+ * @param TabuleiroAntigo Tabuleiro antes do empurrão.
+ * @param LinhaEmpurrador Linha original do jogador que está empurrando.
+ * @param ColunaEmpurrador Coluna original do jogador que está empurrando.
+ * @param LinhaEmpurrado Linha do jogador que está sendo empurrado.
+ * @param ColunaEmpurrado Coluna do jogador que está sendo empurrado.
+ * @param NovaLinha Linha onde a árvore está (logo após o empurrado).
+ * @param NovaColuna Coluna onde a árvore está (logo após o empurradp).
+ * @param JogadorEmpurrador Peça do jogador que está realizou o empurrão.
+ * @param JogadorEmpurrado Peça do jogador que foi empurrada.
+ * @param TabuleiroAtualizado Tabuleiro resultante após a queda da árvore.
+ */
+    
     espacoVazio(Ev),
 
     (
