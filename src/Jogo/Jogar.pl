@@ -28,7 +28,7 @@ iniciarJogo :-
         jogador1_nome(N1),
         jogador1(J1),
         iniciarTabuleiros(Passado, Presente, Futuro),
-        rodada(J1, N1, passado, futuro, 0, 0, Passado, Presente, Futuro,Modo)  
+        rodada(J1, N1, passado, futuro, 0, 0, Passado, Presente, Futuro, Modo)  
         ;
         OpcaoMenu == s ->
         halt
@@ -123,8 +123,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     ),
 
     % Primeira jogada
-    (Modo == 'a', Nome == 'bot' ->
-    jogarBot(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1)
+    (Modo == 'a', Nome == 'bot' -> jogarBot(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1)
     ;
     jogar(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1)
     ),
@@ -138,8 +137,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     ),
 
     % Segunda jogada
-    (Modo == 'a', Nome == 'bot' ->
-    jogarBot(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
+    (Modo == 'a', Nome == 'bot' -> jogarBot(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
     ;
     jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
     ),
@@ -156,7 +154,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     
     % Define o foco para a próxima rodada
     (Modo == 'a' ->
-        Peca == J1 -> 
+        (Peca == J1 -> 
             definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
             NovoFocoJ2 = FocoJ2,
             NovaPeca = J2, 
@@ -170,7 +168,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
             NovosClonesJ1 = ClonesJ1, 
             NovosClonesJ2 = NovoClone2,
             jogador1_nome(NovoNome),
-            format("Foco escolhido pelo Bot: ~w~n", [NovoFocoJ2])
+            format("Foco escolhido pelo Bot: ~w~n", [NovoFocoJ2]))
         ;
         (
             Peca == J1 -> 
@@ -188,8 +186,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
             NovosClonesJ2 = NovoClone2,
             jogador1_nome(NovoNome)
         )
-    )
-    ,
+    ),
     writeln("Mudando para o próximo jogador."),
     % Alterna para o outro jogador (mantendo os focos atualizados)
     rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2, Modo).
@@ -210,14 +207,18 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
 
     ( Escolha == 'm' ->
         repeat,
+        writeln("entrou em movimento"),
         movimentoBot(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, LinhaDestino, ColunaDestino, Jogador, NovoPassado, NovoPresente, NovoFuturo),
         NovoClones = Clones,
-        NovoFoco = Foco  
+        NovoFoco = Foco,
+        writeln("saiu em movimento")
 
     ; Escolha == 'p' ->
+        writeln("entrou em plantar"),
         plantarSementeBot(Passado, Presente, Futuro, Foco, LinhaDestino, ColunaDestino, NovoPassado, NovoPresente, NovoFuturo),
         NovoClones = Clones,
-        NovoFoco = Foco
+        NovoFoco = Foco,
+        writeln("saiu em plantar")
 
     ; Escolha == 'v' ->
     obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna),
