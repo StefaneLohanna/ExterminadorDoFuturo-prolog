@@ -1,9 +1,7 @@
-% File: controllerPlantas.pl
+:- module(controllerPlantas, [plantarSemente/9, removerSemente/9, plantarSementeBot/9]).
 
-% Módulo responsável pelo controle do plantio de sementes em diferentes períodos de tempo
-:- module(controllerPlantas, [plantarSemente/9, removerSemente/9]). % Exporta corretamente o predicado de aridade 9
 :- use_module('./src/Jogo/Tabuleiro.pl').
-% Importa o módulo tabuleiro e a função plantar/5, que modifica o estado do tabuleiro
+:- use_module('./src/Jogo/Movimento.pl').
 
 
 /*
@@ -26,26 +24,50 @@ plantarSemente(TPassado, TPresente, TFuturo, Tempo, Linha, Coluna, NovoTPassado,
     semente(Semente),
     arbusto(Arbusto),
     arvore(Arvore),
+    escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna),
     (Tempo == 'passado' ->
-        plantar(TPassado, Semente, Linha, Coluna, TempPassado),
-        plantar(TPresente, Arbusto, Linha, Coluna, TempPresente),
-        plantar(TFuturo, Arvore, Linha, Coluna, TempFuturo),
+        plantar(TPassado, Semente, NovaLinha, NovaColuna, TempPassado),
+        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, TempPresente),
+        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, TempFuturo),
         NovoTPassado = TempPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
     ; Tempo == 'presente' ->
-        plantar(TPresente, Semente, Linha, Coluna, TempPresente),
-        plantar(TFuturo, Arbusto, Linha, Coluna, TempFuturo),
+        plantar(TPresente, Semente, NovaLinha, NovaColuna, TempPresente),
+        plantar(TFuturo, Arbusto, NovaLinha, NovaColuna, TempFuturo),
         NovoTPassado = TPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
     ; Tempo == 'futuro' ->
-        plantar(TFuturo, Semente, Linha, Coluna, TempFuturo),
+        plantar(TFuturo, Semente, NovaLinha, NovaColuna, TempFuturo),
         NovoTPassado = TPassado,
         NovoTPresente = TPresente,
         NovoTFuturo = TempFuturo
     ).
 
+plantarSementeBot(TPassado, TPresente, TFuturo, Tempo, NovaLinha, NovaColuna, NovoTPassado, NovoTPresente, NovoTFuturo) :-
+    semente(Semente),
+    arbusto(Arbusto),
+    arvore(Arvore),
+    (Tempo == 'passado' ->
+        plantar(TPassado, Semente, NovaLinha, NovaColuna, TempPassado),
+        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, TempPresente),
+        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, TempFuturo),
+        NovoTPassado = TempPassado,
+        NovoTPresente = TempPresente,
+        NovoTFuturo = TempFuturo
+    ; Tempo == 'presente' ->
+        plantar(TPresente, Semente, NovaLinha, NovaColuna, TempPresente),
+        plantar(TFuturo, Arbusto, NovaLinha, NovaColuna, TempFuturo),
+        NovoTPassado = TPassado,
+        NovoTPresente = TempPresente,
+        NovoTFuturo = TempFuturo
+    ; Tempo == 'futuro' ->
+        plantar(TFuturo, Semente, NovaLinha, NovaColuna, TempFuturo),
+        NovoTPassado = TPassado,
+        NovoTPresente = TPresente,
+        NovoTFuturo = TempFuturo
+    ).
 
 removerSemente(TPassado, TPresente, TFuturo, Tempo, Linha, Coluna, NovoTPassado, NovoTPresente, NovoTFuturo) :-
     semente(Semente),

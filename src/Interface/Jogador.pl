@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, escolherMovimento/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
@@ -333,3 +333,17 @@ stringParaFoco("futuro", futuro).
 removerEspacos(Str, SemEspacos) :-
     split_string(Str, " ", "", Lista),
     atomic_list_concat(Lista, "", SemEspacos).
+
+escolherModoDeJogo(Escolha):-
+        imprimirTxt('src/Interface/menus/escolherModoDeJogo.txt'),
+        read_line_to_string(user_input, Entrada),
+        string_lower(Entrada, Lower),
+        removerEspacos(Lower, EntradaLimpa),
+        atom_string(EscolhaConvertida, EntradaLimpa),
+        (
+            member(EscolhaConvertida, [a, d]) ->
+                Escolha = EscolhaConvertida
+            ;
+                writeln("Entrada inválida! Tente novamente."),
+                escolherModoDeJogo(Escolha)
+        ).

@@ -9,12 +9,13 @@
 :- use_module('./src/Interface/Jogador.pl').
 :- use_module('./src/Utils/Ranking.pl').
 :- use_module('./src/Jogo/ViagemNoTempo.pl').
+:- use_module('./src/Utils/Bot.pl').
 
 :- use_module(library(readutil)). % para ler linha completa com read_line_to_string
 :- use_module(library(apply)).   % para maplist
 :- use_module(library(strings)). % para string_lower (se necessário)
+:- use_module(library(system)).
 
-espacoVazio(_Ev).
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
     */
@@ -22,11 +23,12 @@ iniciarJogo :-
     exibirOpcaoMenu(OpcaoMenu),
     (
         OpcaoMenu == j ->
-        registrarJogadores,
+        escolherModoDeJogo(Modo),
+        (Modo == 'a' -> registrarJogadorUnico ; registrarJogadores),
         jogador1_nome(N1),
         jogador1(J1),
         iniciarTabuleiros(Passado, Presente, Futuro),
-        rodada(J1, N1, passado, futuro, 0, 0, Passado, Presente, Futuro)  
+        rodada(J1, N1, passado, futuro, 0, 0, Passado, Presente, Futuro,Modo)  
         ;
         OpcaoMenu == s ->
         halt
@@ -70,7 +72,7 @@ Realiza o registro dos jogadores
     assertz(jogador2_nome(Nome2Min)),
     format("Jogador 2 ficará com o ~w~n", [J2]).
 
-registrarJogadorUunico :-
+registrarJogadorUnico :-
 /* 
 Realiza o registro do jogador que jogará contra o bot
 */
@@ -84,7 +86,8 @@ Realiza o registro do jogador que jogará contra o bot
     read_line_to_string(user_input, Nome),
     formatar(Nome, NomeMin),
     assertz(jogador1_nome(NomeMin)),
-    format("Seu personagem será o ~w~n", [J1]).
+    format("Seu personagem será o ~w~n", [J1]),
+    assertz(jogador2_nome('bot')).
 
 /*
  * Controla a rodada do jogo, permitindo que cada jogador realize duas jogadas antes de alternar.
@@ -97,7 +100,7 @@ Realiza o registro do jogador que jogará contra o bot
  * @param Futuro     O tabuleiro representando o estado atual do futuro.
  */
 
-rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :-
+rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, Modo) :-
     jogador1(J1),
     jogador2(J2),
     exclamacao(Exclamacao),
@@ -120,7 +123,11 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
     ),
 
     % Primeira jogada
-    jogar(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1),
+    (Modo == 'a', Nome == 'bot' ->
+    jogarBot(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1)
+    ;
+    jogar(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1)
+    ),
 
     % Verifica vitória após a primeira jogada
     (verificarVitoria(NovoPassado1, NovoPresente1, NovoFuturo1, Peca) ->
@@ -131,7 +138,11 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
     ),
 
     % Segunda jogada
-    jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _),
+    (Modo == 'a', Nome == 'bot' ->
+    jogarBot(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
+    ;
+    jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
+    ),
 
     % Verifica vitória após a segunda jogada
     (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
@@ -144,25 +155,111 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro) :
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
     
     % Define o foco para a próxima rodada
-    (
+    (Modo == 'a' ->
         Peca == J1 -> 
-        definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
-        NovoFocoJ2 = FocoJ2,
-        NovaPeca = J2, 
-        NovosClonesJ1 = NovoClone2,
-        NovosClonesJ2 = ClonesJ2,
-        jogador2_nome(NovoNome)
+            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+            NovoFocoJ2 = FocoJ2,
+            NovaPeca = J2, 
+            NovosClonesJ1 = NovoClone2,
+            NovosClonesJ2 = ClonesJ2,
+            jogador2_nome(NovoNome)
+            ;
+            escolherTempoBot(NovoFoco, NovoFocoJ2),
+            NovoFocoJ1 = FocoJ1,
+            NovaPeca = J1,
+            NovosClonesJ1 = ClonesJ1, 
+            NovosClonesJ2 = NovoClone2,
+            jogador1_nome(NovoNome),
+            format("Foco escolhido pelo Bot: ~w~n", [NovoFocoJ2])
         ;
-        definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
-        NovoFocoJ1 = FocoJ1,
-        NovaPeca = J1,
-        NovosClonesJ1 = ClonesJ1, 
-        NovosClonesJ2 = NovoClone2,
-        jogador1_nome(NovoNome)
-    ),
+        (
+            Peca == J1 -> 
+            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+            NovoFocoJ2 = FocoJ2,
+            NovaPeca = J2, 
+            NovosClonesJ1 = NovoClone2,
+            NovosClonesJ2 = ClonesJ2,
+            jogador2_nome(NovoNome)
+            ;
+            definirFoco(J2, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ2),
+            NovoFocoJ1 = FocoJ1,
+            NovaPeca = J1,
+            NovosClonesJ1 = ClonesJ1, 
+            NovosClonesJ2 = NovoClone2,
+            jogador1_nome(NovoNome)
+        )
+    )
+    ,
     writeln("Mudando para o próximo jogador."),
     % Alterna para o outro jogador (mantendo os focos atualizados)
-    rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2).
+    rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2, Modo).
+
+jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
+    exibirTabuleiros(Passado, Presente, Futuro),
+    negado(Negado),
+    escolherJogadaBot(Escolha),
+    sleep(1),
+
+    ( Foco == passado -> Tabuleiro = Passado
+    ; Foco == presente -> Tabuleiro = Presente
+    ; Foco == futuro -> Tabuleiro = Futuro
+    ),
+    obtemCoordenadasValidasBot(Tabuleiro, Jogador, Linha, Coluna, LinhaDestino, ColunaDestino),
+    format("Jogada Escolhida pelo bot: ~w (~w, ~w)~n", [Escolha, LinhaDestino, ColunaDestino]),
+    sleep(1),
+
+    ( Escolha == 'm' ->
+        repeat,
+        movimentoBot(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, LinhaDestino, ColunaDestino, Jogador, NovoPassado, NovoPresente, NovoFuturo),
+        NovoClones = Clones,
+        NovoFoco = Foco  
+
+    ; Escolha == 'p' ->
+        plantarSementeBot(Passado, Presente, Futuro, Foco, LinhaDestino, ColunaDestino, NovoPassado, NovoPresente, NovoFuturo),
+        NovoClones = Clones,
+        NovoFoco = Foco
+
+    ; Escolha == 'v' ->
+    obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna),
+    escolherTempo(TempoEscolhido),
+    defineViagem(Foco, Clones, TempoEscolhido, Resultado),
+    (
+        Resultado == "viagem impossível" ->
+            format("~w Viagem impossível. Tente outra jogada.~n", [Negado]),
+            %writeln("Viagem impossível. Tente outra jogada."),
+            jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
+                    NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+        ;
+        (
+            ( TempoEscolhido == "passado" -> TabDestino = Passado ;
+            TempoEscolhido == "presente" -> TabDestino = Presente ;
+            TempoEscolhido == "futuro" -> TabDestino = Futuro
+            ),
+            verificaPosicaoLivre(TabDestino, Linha, Coluna, Livre),
+            (
+                Livre == true ->
+                    viagem(Foco, Clones, TempoEscolhido, Linha, Coluna, Jogador,
+                        Passado, Presente, Futuro,
+                        NovoPassado, NovoPresente, NovoFuturo, NovoClones),
+                    stringParaFoco(TempoEscolhido, NovoFoco)
+                ;
+                    format("~w A posição no tempo de destino já está ocupada. Tente outra jogada.~n", [Negado]),
+                    %writeln("A posição no tempo de destino já está ocupada. Tente outra jogada."),
+                    jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
+                        NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+
+            )
+        )
+    )
+
+    ; Escolha == 'r' ->
+        writeln("Reiniciando o jogo..."),
+        iniciarJogo
+    ; % fallback
+        format("~w Escolha inválida inesperada!~n", [Negado]),
+        %writeln("Escolha inválida inesperada!"),
+        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
+    ).
 
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirTabuleiros(Passado, Presente, Futuro),
@@ -174,18 +271,15 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
     ; Foco == presente -> Tabuleiro = Presente
     ; Foco == futuro -> Tabuleiro = Futuro
     ),
+    obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna),
 
     ( Escolha == 'm' ->
         repeat,
-        obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna),
-        escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna),
-        movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, NovaLinha, NovaColuna, Jogador, NovoPassado, NovoPresente, NovoFuturo),
+        movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, Jogador, NovoPassado, NovoPresente, NovoFuturo),
         NovoClones = Clones,
         NovoFoco = Foco  
 
     ; Escolha == 'p' ->
-        obterLinha(Linha),
-        obterColuna(Coluna),
         plantarSemente(Passado, Presente, Futuro, Foco, Linha, Coluna, NovoPassado, NovoPresente, NovoFuturo),
         NovoClones = Clones,
         NovoFoco = Foco
@@ -204,15 +298,15 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
         ;
         (
             ( TempoEscolhido == "passado" -> TabDestino = Passado ;
-              TempoEscolhido == "presente" -> TabDestino = Presente ;
-              TempoEscolhido == "futuro" -> TabDestino = Futuro
+                TempoEscolhido == "presente" -> TabDestino = Presente ;
+                TempoEscolhido == "futuro" -> TabDestino = Futuro
             ),
             verificaPosicaoLivre(TabDestino, Linha, Coluna, Livre),
             (
                 Livre == true ->
                     viagem(Foco, Clones, TempoEscolhido, Linha, Coluna, Jogador,
-                           Passado, Presente, Futuro,
-                           NovoPassado, NovoPresente, NovoFuturo, NovoClones),
+                            Passado, Presente, Futuro,
+                            NovoPassado, NovoPresente, NovoFuturo, NovoClones),
                     stringParaFoco(TempoEscolhido, NovoFoco)
                 ;
                     format("~w A posição no tempo de destino já está ocupada. Tente outra jogada.~n", [Negado]),
