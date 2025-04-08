@@ -1,6 +1,6 @@
-:- module(jogar, [iniciarJogo/0]).
+:- module(jogar, [inicio/0]).
 
-:- dynamic jogador1_nome/1.
+:- dynamic jogador1_nome/1. 
 :- dynamic jogador2_nome/1.
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
@@ -12,9 +12,14 @@
 :- use_module('./src/Utils/Bot.pl').
 
 :- use_module(library(readutil)). % para ler linha completa com read_line_to_string
-:- use_module(library(apply)).   % para maplist
+:- use_module(library(apply)).   % 
 :- use_module(library(strings)). % para string_lower (se necessário)
 :- use_module(library(system)).
+
+inicio :-
+    exibirHistoria,
+    iniciarJogo.
+
 
 iniciarJogo :-
     /* Função temporária para iniciar o jogo, atualmente só inica o tabuleiro e faz a rodada.
@@ -150,8 +155,10 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
         true
     ),
     
+    exibirDelimitadorInicial,
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
-    
+    exibirDelimitadorFinal,
+
     % Define o foco para a próxima rodada
     (Modo == 'a' ->
         (Peca == J1 -> 
@@ -263,7 +270,9 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
     ).
 
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
+    exibirDelimitadorInicial,
     exibirTabuleiros(Passado, Presente, Futuro),
+    exibirDelimitadorFinal,
     negado(Negado),
     escolherJogada(Escolha),
 
@@ -342,6 +351,7 @@ nomeDoJogador(Peca, Nome) :-
     ).
 
 finalizarJogo(NomeJogador) :-
+    exibirFimDeJogo,
     format('Parabéns, ~w! Você venceu!~n', [NomeJogador]),
     atualizarRanking(NomeJogador, 1),
     mostrarRanking,

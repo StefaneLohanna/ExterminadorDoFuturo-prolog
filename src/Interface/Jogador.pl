@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1, exibirHistoria/0, exibirDelimitadorFinal/0,exibirDelimitadorInicial/0,exibirFimDeJogo/0]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
@@ -90,8 +90,62 @@ escolherJogada(Escolha) :-
     ).
 
 
+exibirHistoria :-
+/*
+ * Exibe o contexto do jogo.
+ */
+    imprimirTxt('src/Interface/textosDeExibicao/exterminadorDoFuturo.txt').
+
+
+
+exibirMenuJogadas :-
+/*
+ * Exibe o menu de jogadas que um jogador pode realizar.
+ */
+    imprimirTxt('src/Interface/menus/jogadas.txt').
+
+
+exibirMenuFoco :-
+/*
+ * Exibe o menu de escolha de foco para o jogador.
+ */
+    imprimirTxt('src/Interface/menus/foco.txt').
+
+exibirModoJogo :-
+/*
+ * Exibe o menu de modos de jogar.
+ */
+    imprimirTxt('src/Interface/textosDeExibicao/modoDeJogo.txt').
+
+exibirDetalhamento :-
+/*
+ * Exibe o menu do detalhamento de jogo.
+ */
+    imprimirTxt('src/Interface/textosDeExibicao/detalhamentoJogo.txt').
+
 exibirMenu :-
+/*
+ * Exibe o menu do jogo.
+ */
     imprimirTxt('src/Interface/menus/menu.txt').
+
+exibirDelimitadorFinal :-
+/*
+ * Exibe o delimitador final.
+ */
+ imprimirTxt('src/Interface/textosDeExibicao/delimitadorFinal.txt').
+
+exibirDelimitadorInicial :-
+/*
+ * Exibe o delimitador inicial.
+ */
+ imprimirTxt('src/Interface/textosDeExibicao/delimitadorInicial.txt').
+
+exibirFimDeJogo :-
+/*
+ * Exibe o texto de fim de jogo.
+ */
+ imprimirTxt('src/Interface/textosDeExibicao/fimDeJogo.txt').
 
 
 escolherOpcaoMenu(EscolhaFinal) :-
@@ -129,33 +183,6 @@ exibirOpcaoMenu(Opcao) :-
         true
     
     ).
-
-
-exibirMenuJogadas :-
-/*
- * Exibe o menu de jogadas que um jogador pode realizar.
- */
-    imprimirTxt('src/Interface/menus/jogadas.txt').
-
-
-exibirMenuFoco :-
-/*
- * Exibe o menu de escolha de foco para o jogador.
- */
-    imprimirTxt('src/Interface/menus/foco.txt').
-
-exibirModoJogo :-
-/*
- * Exibe o menu de modos de jogar.
- */
-    imprimirTxt('src/Interface/textosDeExibicao/modoDeJogo.txt').
-
-exibirDetalhamento :-
-/*
- * Exibe o menu do detalhamento de jogo.
- */
-    imprimirTxt('src/Interface/textosDeExibicao/detalhamentoJogo.txt').
-
 
 /*
  * Obtém coordenadas válidas em que o jogador está posicionado no tabuleiro.

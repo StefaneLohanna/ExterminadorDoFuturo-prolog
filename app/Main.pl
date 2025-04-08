@@ -5,9 +5,9 @@
 
 main :-
     /*
-    Main para controle, atualmente só chama a função iniciarJogo.
+    Main para controle, atualmente só chama a função inicio.
     */
-    iniciarJogo,
+    inicio,
     halt.
 
 :- initialization(main).
