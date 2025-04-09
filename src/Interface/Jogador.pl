@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1, exibirHistoria/0, exibirDelimitadorFinal/0,exibirDelimitadorInicial/0,exibirFimDeJogo/0]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1, exibirHistoria/0, exibirDelimitadorFinal/0,exibirDelimitadorInicial/0,exibirFimDeJogo/0, escolherMovimento/4]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
@@ -278,34 +278,29 @@ escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
 
     Returns: a nova coordenada para que o jogador se mova.
     */
-    negado(Negado),
-    writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
-    read_line_to_string(user_input, Entrada),
-    string_lower(Entrada, Lower),
-    removerEspacos(Lower, EntradaSemEspaco),
-    atom_string(Direcao, EntradaSemEspaco),
+    lerDirecaoValida(Direcao),
     ( Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
-    ; Direcao == a -> TempLinha is Linha, TempColuna is Coluna - 1
+    ; Direcao == a -> TempLinha is Linha,     TempColuna is Coluna - 1
     ; Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
-    ; Direcao == d -> TempLinha is Linha, TempColuna is Coluna + 1
-    ; format("~w Direção inválida! Use apenas w, a, s ou d.", [Negado]),
-    %writeln("Direção inválida! Use apenas w, a, s ou d."),
-      escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
-    ), 
+    ; Direcao == d -> TempLinha is Linha,     TempColuna is Coluna + 1
+    ),
     ( TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
         NovaLinha = TempLinha, NovaColuna = TempColuna
     ;
+        negado(Negado),
         format("~w Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro.", [Negado]),
-        %writeln("Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro."),
         escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
     ).
 
 lerDirecaoValida(Direcao) :-
     negado(Negado),
     writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
-    read(Input),
-    ( member(Input, [w, a, s, d]) ->
-        Direcao = Input
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(DirecaoAtom, EntradaSemEspaco),
+    ( member(DirecaoAtom, [w, a, s, d]) ->
+        Direcao = DirecaoAtom
     ;
         format("~w Direção inválida! Use apenas w, a, s ou d.", [Negado]),
         lerDirecaoValida(Direcao)
