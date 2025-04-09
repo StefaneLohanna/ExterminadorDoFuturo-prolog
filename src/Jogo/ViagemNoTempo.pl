@@ -1,6 +1,7 @@
-:- module(viagemNoTempo, [defineViagem/4, viagem/13]).
+:- module(viagemNoTempo, [defineViagem/4, viagem/13, viagemBot/13]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
+:- use_module('./src/Jogo/ControllerPlantas.pl').
 
 viagem(FocoAtual, Clones, NovoTempoStr, Linha, Coluna, Jogador,
        Passado, Presente, Futuro,
@@ -126,3 +127,40 @@ defineViagem(Foco, Clones, NovoTempo, Resultado) :-
 	;   writeln("Opção Inválida"),
 		Resultado = "viagem impossível"
 	).
+
+
+viagemBot(Foco, Clones, Linha, Coluna, Jogador,
+          Passado, Presente, Futuro,
+          NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
+
+    % Tenta escolher um tempo diferente do foco atual
+    findall(T, (member(T, ["passado", "presente", "futuro"]), T \= Foco), TemposDisponiveis),
+    random_member(TempoEscolhido, TemposDisponiveis),
+
+    defineViagem(Foco, Clones, TempoEscolhido, Resultado),
+        (Resultado == "viagem impossível" ->
+		%format("~w Viagem impossível. Tente outra jogada.~n", [Negado]),
+            writeln("❌ Viagem impossível para o bot."),
+            jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
+                    NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+        ;
+        (
+            ( TempoEscolhido == "passado" -> TabDestino = Passado ;
+              TempoEscolhido == "presente" -> TabDestino = Presente ;
+              TempoEscolhido == "futuro" -> TabDestino = Futuro
+            ),
+            verificaPosicaoLivre(TabDestino, Linha, Coluna, Livre),
+            (
+                Livre == true ->
+                    viagem(Foco, Clones, TempoEscolhido, Linha, Coluna, Jogador,
+                            Passado, Presente, Futuro,
+                            NovoPassado, NovoPresente, NovoFuturo, NovoClones),
+                    stringParaFoco(TempoEscolhido, NovoFoco),
+                    writeln("✔️ Viagem realizada com sucesso"),
+                    writeln("saiu em viagem")
+                ;
+                    writeln("❌ Posição ocupada no destino."),
+                    jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
+                    NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+			))
+    ).

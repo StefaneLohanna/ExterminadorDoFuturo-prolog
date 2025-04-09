@@ -1,4 +1,4 @@
-:- module(jogar, [inicio/0, nomeDoJogador/2]).
+:- module(jogar, [inicio/0, nomeDoJogador/2, jogarBot/11]).
 
 :- dynamic jogador1_nome/1. 
 :- dynamic jogador2_nome/1.
@@ -161,7 +161,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     ;
         true
     ),
-    
+     
     exibirDelimitadorInicial,
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
     exibirFoco(NovoFoco2),
@@ -206,7 +206,9 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     % Alterna para o outro jogador (mantendo os focos atualizados)
     rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2, Modo).
 
-jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
+jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
+         NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
+
     exibirTabuleiros(Passado, Presente, Futuro),
     exibirFoco(Foco),
     negado(Negado),
@@ -217,6 +219,7 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
     ; Foco == presente -> Tabuleiro = Presente
     ; Foco == futuro -> Tabuleiro = Futuro
     ),
+
     obtemCoordenadasValidasBot(Tabuleiro, Jogador, Linha, Coluna, LinhaDestino, ColunaDestino),
     format("Jogada Escolhida pelo bot: ~w (~w, ~w)~n", [Escolha, LinhaDestino, ColunaDestino]),
     sleep(1),
@@ -224,59 +227,39 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
     ( Escolha == 'm' ->
         repeat,
         writeln("entrou em movimento"),
-        movimentoBot(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, LinhaDestino, ColunaDestino, Jogador, NovoPassado, NovoPresente, NovoFuturo),
+        movimentoBot(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, LinhaDestino, ColunaDestino, Jogador,
+                     NovoPassado, NovoPresente, NovoFuturo),
         NovoClones = Clones,
         NovoFoco = Foco,
         writeln("saiu em movimento")
 
     ; Escolha == 'p' ->
         writeln("entrou em plantar"),
-        plantarSementeBot(Passado, Presente, Futuro, Foco, LinhaDestino, ColunaDestino, NovoPassado, NovoPresente, NovoFuturo),
+        plantarSementeBot(Passado, Presente, Futuro, Foco, LinhaDestino, ColunaDestino,
+                          NovoPassado, NovoPresente, NovoFuturo),
         NovoClones = Clones,
         NovoFoco = Foco,
         writeln("saiu em plantar")
 
     ; Escolha == 'v' ->
-    writeln("entrou em viagem"),
-    escolherTempo(TempoEscolhido),
-    defineViagem(Foco, Clones, TempoEscolhido, Resultado),
-    (
-        Resultado == "viagem impossível" ->
-            format("~w Viagem impossível. Tente outra jogada.~n", [Negado]),
-            %writeln("Viagem impossível. Tente outra jogada."),
-            jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
-                    NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
-        ;
-        (
-            ( TempoEscolhido == "passado" -> TabDestino = Passado ;
-            TempoEscolhido == "presente" -> TabDestino = Presente ;
-            TempoEscolhido == "futuro" -> TabDestino = Futuro
-            ),
-            verificaPosicaoLivre(TabDestino, Linha, Coluna, Livre),
-            (
-                Livre == true ->
-                    viagem(Foco, Clones, TempoEscolhido, Linha, Coluna, Jogador,
-                        Passado, Presente, Futuro,
-                        NovoPassado, NovoPresente, NovoFuturo, NovoClones),
-                    stringParaFoco(TempoEscolhido, NovoFoco)
-                ;
-                    format("~w A posição no tempo de destino já está ocupada. Tente outra jogada.~n", [Negado]),
-                    %writeln("A posição no tempo de destino já está ocupada. Tente outra jogada."),
-                    jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
-                        NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+        writeln("entrou em viagem"),
+        viagemBot(Foco, Clones, Linha, Coluna, Jogador,
+                  Passado, Presente, Futuro,
+                  NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
+        %writeln("saiu em viagem")
 
-            )
-        )
-    )
 
     ; Escolha == 'r' ->
         writeln("Reiniciando o jogo..."),
         iniciarJogo
+
     ; % fallback
         format("~w Escolha inválida inesperada!~n", [Negado]),
-        %writeln("Escolha inválida inesperada!"),
-        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
+        NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro,
+        NovoClones = Clones,
+        NovoFoco = Foco
     ).
+
 
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirDelimitadorInicial,
