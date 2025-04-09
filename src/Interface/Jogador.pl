@@ -1,4 +1,4 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1, exibirHistoria/0, exibirDelimitadorFinal/0,exibirDelimitadorInicial/0,exibirFimDeJogo/0, escolherMovimento/4]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1, exibirHistoria/0, exibirDelimitadorFinal/0,exibirDelimitadorInicial/0, exibirFimDeJogo/0, escolherMovimento/4, exibirFoco/1]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Utils/ImprimirTxt.pl').
@@ -88,6 +88,25 @@ escolherJogada(Escolha) :-
             %writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
     ).
+
+exibirFoco(Foco) :-
+    (Foco == passado ->
+        exibirFocoPassado
+    ; Foco == presente ->
+        exibirFocoPresente
+    ; Foco == futuro ->
+        exibirFocoFuturo
+    ; true
+    ).
+
+exibirFocoPassado :-
+    imprimirTxt('src/Interface/textosDeExibicao/passado.txt').
+
+exibirFocoPresente :-
+    imprimirTxt('src/Interface/textosDeExibicao/presente.txt').
+
+exibirFocoFuturo :-
+    imprimirTxt('src/Interface/textosDeExibicao/futuro.txt').
 
 /*
  * Exibe o contexto do jogo.
