@@ -137,6 +137,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     (verificarVitoria(J1, J2, NovoPassado1, NovoPresente1, NovoFuturo1, Vencedor1),
     Vencedor1 \= nenhum -> 
         exibirTabuleiros(NovoPassado1, NovoPresente1, NovoFuturo1),
+        exibirFoco(NovoFoco1),
         finalizarJogo(Vencedor1)
     ;
         true
@@ -155,6 +156,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     (verificarVitoria(J1, J2, NovoPassado2, NovoPresente2, NovoFuturo2, Vencedor2),
     Vencedor2 \= nenhum -> 
         exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
+        exibirFoco(NovoFoco2),
         finalizarJogo(Vencedor2)
     ;
         true
@@ -162,6 +164,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     
     exibirDelimitadorInicial,
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
+    exibirFoco(NovoFoco2),
     % exibirDelimitadorFinal,
 
     % Define o foco para a próxima rodada
@@ -205,6 +208,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
 
 jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirTabuleiros(Passado, Presente, Futuro),
+    exibirFoco(Foco),
     negado(Negado),
     escolherJogadaBot(Escolha),
     sleep(1),
@@ -233,6 +237,7 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
         writeln("saiu em plantar")
 
     ; Escolha == 'v' ->
+    writeln("entrou em viagem"),
     escolherTempo(TempoEscolhido),
     defineViagem(Foco, Clones, TempoEscolhido, Resultado),
     (
@@ -276,6 +281,7 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirDelimitadorInicial,
     exibirTabuleiros(Passado, Presente, Futuro),
+    exibirFoco(Foco),
     % exibirDelimitadorFinal,
     negado(Negado),
     escolherJogada(Escolha),

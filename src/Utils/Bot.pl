@@ -13,9 +13,9 @@
 :- use_module('./src/Interface/Jogador.pl').
 :- use_module('./src/Utils/Ranking.pl').
 
-% Escolhe uma jogada para o bot ('m' para movimentar ou 'p' para plantar)
+% Escolhe uma jogada para o bot ('m' para movimentar ou 'p' para plantar ou 'v' para viajar)
 escolherJogadaBot(Jogada) :-
-    random_member(Jogada, ['m', 'p']).
+    random_member(Jogada, ['m', 'p', 'v']).
 
 % Escolhe coordenadas válidas para jogar
 obtemCoordenadasValidasBot(Tabuleiro, Jogador, Linha, Coluna, LinhaDestino, ColunaDestino) :-
