@@ -1,14 +1,3 @@
-# ExterminadorDoFuturo-prolog
-
-Para rodar execute:
-```
-chmod +x run.sh && ./run.sh
-```
-
-- Windows
-```
-./run.bat
-```
 # O Exterminador do Futuro
 Projeto desenvolvido com foco na programação lógica, utilizando Prolog, para a disciplina Paradigmas de Linguagem de Programação da Universidade Federal de Campina Grande (UFCG).
 
@@ -29,15 +18,7 @@ Para executar o projeto, siga os seguintes passos:
     ```
     cd ExterminadorDoFuturo-prolog
     ```
-4. (Apenas para usuários Windows) Configurar o terminal para exibir caracteres Unicode corretamente
-
-   O jogo utiliza caracteres Unicode para representar algumas peças no tabuleiro. No entanto, o terminal do Windows pode não exibi-los corretamente. Para evitar esse problema, execute o seguinte comando antes de rodar o jogo:  
-    ```
-    chcp 65001
-    ```
-    Esse comando altera a página de código do terminal para UTF-8, garantindo a exibição correta dos caracteres.
-   
-5. Rode o projeto
+4. Rode o projeto
     ```
     swipl -q -s app/Main.pl -t main
     ```
