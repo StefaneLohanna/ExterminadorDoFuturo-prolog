@@ -108,7 +108,7 @@ Realiza o registro do jogador que jogará contra o bot
 rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, Modo) :-
     jogador1(J1),
     jogador2(J2),
-    exclamacao(Exclamacao),
+    %% exclamacao(Exclamacao),
     %% Usa o predicado auxiliar para obter o nome correto
     nomeDoJogador(Peca, Nome),
     format("Vez do jogador: ~w (~w)~n", [Nome, Peca]),
@@ -119,13 +119,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
         (FocoAtual = FocoJ2, CloneAtual = ClonesJ2)
     ),
             
-
-    % Verifica se o jogador está presente no foco atual
-    (focoValido(FocoAtual, Peca, Passado, Presente, Futuro) -> NovoFoco = FocoAtual;
-        format("~w Jogador não está presente nesse foco. Escolha outro. ~n", [Exclamacao]),
-        %writeln('Jogador não está presente nesse foco. Escolha outro.'),
-        definirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)
-    ),
+    verificarOuDefinirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco),
 
     % Primeira jogada
     (Modo == 'a', Nome == 'bot' -> jogarBot(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1)
@@ -143,20 +137,22 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
         true
     ),
 
+    verificarOuDefinirFoco(Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoFoco1, NovoFoco2),
+
     % Segunda jogada
     (Modo == 'a', Nome == 'bot' ->
-        jogarBot(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1,
-                 NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
+        jogarBot(NovoFoco2, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1,
+                 NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, NovoFoco3)
     ;
-        jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1,
-              NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
+        jogar(NovoFoco2, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1,
+              NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, NovoFoco3)
     ),
 
     % Verifica vitória após a segunda jogada
     (verificarVitoria(J1, J2, NovoPassado2, NovoPresente2, NovoFuturo2, Vencedor2),
     Vencedor2 \= nenhum -> 
         exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
-        exibirFoco(NovoFoco2),
+        exibirFoco(NovoFoco3),
         finalizarJogo(Vencedor2)
     ;
         true
@@ -164,13 +160,13 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
      
     exibirDelimitadorInicial,
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
-    exibirFoco(NovoFoco2),
+    exibirFoco(NovoFoco3),
     % exibirDelimitadorFinal,
 
     % Define o foco para a próxima rodada
     (Modo == 'a' ->
         (Peca == J1 -> 
-            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco2, NovoFocoJ1),
             NovoFocoJ2 = FocoJ2,
             NovaPeca = J2, 
             NovosClonesJ1 = NovoClone2,
@@ -187,7 +183,7 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
         ;
         (
             Peca == J1 -> 
-            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco, NovoFocoJ1),
+            definirFoco(J1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoFoco2, NovoFocoJ1),
             NovoFocoJ2 = FocoJ2,
             NovaPeca = J2, 
             NovosClonesJ1 = NovoClone2,
@@ -205,6 +201,25 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     writeln("Mudando para o próximo jogador."),
     % Alterna para o outro jogador (mantendo os focos atualizados)
     rodada(NovaPeca, NovoNome, NovoFocoJ1, NovoFocoJ2, NovosClonesJ1, NovosClonesJ2, NovoPassado2, NovoPresente2, NovoFuturo2, Modo).
+
+/*
+ * Verifica se o jogador ainda está presente no foco atual.
+ * Se não estiver, força a redefinição do foco.
+ *
+ * @param Jogador    O símbolo do jogador.
+ * @param Passado    O tabuleiro do passado.
+ * @param Presente   O tabuleiro do presente.
+ * @param Futuro     O tabuleiro do futuro.
+ * @param FocoAtual  O foco atual.
+ * @param NovoFoco   O foco válido retornado.
+ */
+verificarOuDefinirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
+    ( focoValido(FocoAtual, Jogador, Passado, Presente, Futuro) ->
+        NovoFoco = FocoAtual
+    ;
+        writeln('Jogador não está presente nesse foco. Escolha outro foco.'),
+        definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
+    ).
 
 jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
          NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
