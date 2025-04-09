@@ -542,7 +542,7 @@ substituirEmLista([H|T], Index, Elem, [H|Resto]) :-
     Index1 is Index - 1,
     substituirEmLista(T, Index1, Elem, Resto).
 
-verificarVitoria(Jogador1, Jogador2, Passado, Presente, Futuro, VencedorNome) :-
+/*verificarVitoria(Jogador1, Jogador2, Passado, Presente, Futuro, VencedorNome) :-
     contaTabuleirosComJogador([Passado, Presente, Futuro], Jogador1, Conta1),
     contaTabuleirosComJogador([Passado, Presente, Futuro], Jogador2, Conta2),
     (
@@ -554,6 +554,24 @@ verificarVitoria(Jogador1, Jogador2, Passado, Presente, Futuro, VencedorNome) :-
     ;
         VencedorNome = nenhum
     ).
+    ).*/
+
+
+verificarVitoria(J1, J2, Passado, Presente, Futuro, VencedorNome) :-
+    % Conta em quantos tabuleiros cada um aparece
+    contaTabuleirosComJogador([Passado, Presente, Futuro], J1, Conta1),
+    contaTabuleirosComJogador([Passado, Presente, Futuro], J2, Conta2),
+
+    (   % Se J1 está em 0 ou 1 tabuleiro e J2 em >1, J2 venceu
+        (Conta1 =:= 0 ; Conta1 =:= 1), Conta2 > 1 ->
+        nomeDoJogador(J2, VencedorNome)
+
+    ;   % Se J2 está em 0 ou 1 tabuleiro e J1 em >1, J1 venceu
+        (Conta2 =:= 0 ; Conta2 =:= 1), Conta1 > 1 ->
+        nomeDoJogador(J1, VencedorNome)
+
+    ;   % Caso contrário, ainda não há vencedor
+        VencedorNome = nenhum).
 
 contaTabuleirosComJogador(Tabuleiros, Jogador, Conta) :-
     include(temJogador(Jogador), Tabuleiros, Filtrados),
