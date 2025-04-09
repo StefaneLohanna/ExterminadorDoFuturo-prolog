@@ -209,6 +209,7 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
         obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna)
     ).
 
+
 /*
  * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
  *

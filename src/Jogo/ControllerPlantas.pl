@@ -26,20 +26,20 @@ plantarSemente(TPassado, TPresente, TFuturo, Tempo, Linha, Coluna, NovoTPassado,
     arvore(Arvore),
     escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna),
     (Tempo == 'passado' ->
-        plantar(TPassado, Semente, NovaLinha, NovaColuna, TempPassado),
-        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, TempPresente),
-        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, TempFuturo),
+        plantar(TPassado, Semente, NovaLinha, NovaColuna, true, TempPassado, SucessoS),
+        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, SucessoS, TempPresente, SucessoP),
+        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, SucessoP, TempFuturo, _),
         NovoTPassado = TempPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
     ; Tempo == 'presente' ->
-        plantar(TPresente, Semente, NovaLinha, NovaColuna, TempPresente),
-        plantar(TFuturo, Arbusto, NovaLinha, NovaColuna, TempFuturo),
+        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, true, TempPresente, SucessoP),
+        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, SucessoP, TempFuturo, _),
         NovoTPassado = TPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
     ; Tempo == 'futuro' ->
-        plantar(TFuturo, Semente, NovaLinha, NovaColuna, TempFuturo),
+        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, true, TempFuturo, _),
         NovoTPassado = TPassado,
         NovoTPresente = TPresente,
         NovoTFuturo = TempFuturo
@@ -50,20 +50,20 @@ plantarSementeBot(TPassado, TPresente, TFuturo, Tempo, NovaLinha, NovaColuna, No
     arbusto(Arbusto),
     arvore(Arvore),
     (Tempo == 'passado' ->
-        plantar(TPassado, Semente, NovaLinha, NovaColuna, TempPassado),
-        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, TempPresente),
-        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, TempFuturo),
+        plantar(TPassado, Semente, NovaLinha, NovaColuna, true, TempPassado, SucessoS),
+        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, SucessoS, TempPresente, SucessoP),
+        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, SucessoP, TempFuturo, _),
         NovoTPassado = TempPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
     ; Tempo == 'presente' ->
-        plantar(TPresente, Semente, NovaLinha, NovaColuna, TempPresente),
-        plantar(TFuturo, Arbusto, NovaLinha, NovaColuna, TempFuturo),
+        plantar(TPresente, Semente, NovaLinha, NovaColuna, true, TempPresente, SucessoP),
+        plantar(TFuturo, Arbusto, NovaLinha, NovaColuna, SucessoP, TempFuturo, _),
         NovoTPassado = TPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
     ; Tempo == 'futuro' ->
-        plantar(TFuturo, Semente, NovaLinha, NovaColuna, TempFuturo),
+        plantar(TFuturo, Semente, NovaLinha, NovaColuna, true, TempFuturo, _),
         NovoTPassado = TPassado,
         NovoTPresente = TPresente,
         NovoTFuturo = TempFuturo

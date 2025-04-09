@@ -233,14 +233,13 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
         writeln("saiu em plantar")
 
     ; Escolha == 'v' ->
-    obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna),
     escolherTempo(TempoEscolhido),
     defineViagem(Foco, Clones, TempoEscolhido, Resultado),
     (
         Resultado == "viagem impossível" ->
             format("~w Viagem impossível. Tente outra jogada.~n", [Negado]),
             %writeln("Viagem impossível. Tente outra jogada."),
-            jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
+            jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
                     NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
         ;
         (
@@ -258,7 +257,7 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
                 ;
                     format("~w A posição no tempo de destino já está ocupada. Tente outra jogada.~n", [Negado]),
                     %writeln("A posição no tempo de destino já está ocupada. Tente outra jogada."),
-                    jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
+                    jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
                         NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
 
             )
@@ -300,7 +299,6 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
         NovoFoco = Foco
 
     ; Escolha == 'v' ->
-    obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna),
     escolherTempo(TempoEscolhido),
     defineViagem(Foco, Clones, TempoEscolhido, Resultado),
     (

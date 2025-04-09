@@ -1,4 +1,4 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/6, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7, verificaPosicaoLivre/4, negado/1, exclamacao/1, caveira/1]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/7,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/6, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7, verificaPosicaoLivre/4, negado/1, exclamacao/1, caveira/1, espacoVazio/1]).
 
 :- use_module('./src/Jogo/Jogar.pl').
 
@@ -75,9 +75,24 @@ iniciarTabuleiros(Tab1, Tab2, Tab3) :-
     criarTabuleiro(Tab2),
     criarTabuleiro(Tab3).
 
-    % Coloca uma planta em determinada posição do tabuleiro
-plantar(Tabuleiro, Planta, Linha, Coluna, NovoTabuleiro) :-
-    modificarMatriz(Linha, Coluna, Tabuleiro, Planta, NovoTabuleiro).
+% Coloca uma planta em determinada posição do tabuleiro
+plantar(Tabuleiro, Planta, Linha, Coluna, Validacao, NovoTabuleiro, Sucesso) :-
+    ( Validacao == false ->
+        NovoTabuleiro = Tabuleiro,
+        Sucesso = false
+    ;
+        espacoVazio(Vazio),
+        nth1(Linha, Tabuleiro, LinhaLista),
+        nth1(Coluna, LinhaLista, PecaAtual),
+        ( PecaAtual == Vazio ->
+            modificarMatriz(Linha, Coluna, Tabuleiro, Planta, NovoTabuleiro),
+            Sucesso = true
+        ;
+            NovoTabuleiro = Tabuleiro,
+            Sucesso = false
+        )
+    ).
+
 
 % Modifica uma posição na matriz
 modificarMatriz(1, C, [Linha|Resto], NovoValor, [NovaLinha|Resto]) :-
