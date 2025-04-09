@@ -2,6 +2,16 @@
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
 :- use_module('./src/Jogo/ControllerPlantas.pl').
+:- use_module('./src/Interface/Jogador.pl').
+
+
+
+%! stringParaFoco(+TempoStr:string, -Foco:atom) is det.
+% Converte a string do tempo ("passado"/"presente"/"futuro") em átomo.
+/*stringParaFoco("passado", passado).
+stringParaFoco("presente", presente).
+stringParaFoco("futuro",  futuro). */
+
 
 viagem(FocoAtual, Clones, NovoTempoStr, Linha, Coluna, Jogador,
        Passado, Presente, Futuro,
@@ -140,7 +150,7 @@ viagemBot(Foco, Clones, Linha, Coluna, Jogador,
     defineViagem(Foco, Clones, TempoEscolhido, Resultado),
         (Resultado == "viagem impossível" ->
 		%format("~w Viagem impossível. Tente outra jogada.~n", [Negado]),
-            writeln("❌ Viagem impossível para o bot."),
+            writeln("Viagem impossível para o bot."),
             jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
                     NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
         ;
@@ -156,10 +166,10 @@ viagemBot(Foco, Clones, Linha, Coluna, Jogador,
                             Passado, Presente, Futuro,
                             NovoPassado, NovoPresente, NovoFuturo, NovoClones),
                     stringParaFoco(TempoEscolhido, NovoFoco),
-                    writeln("✔️ Viagem realizada com sucesso"),
+                    writeln("Viagem realizada com sucesso"),
                     writeln("saiu em viagem")
                 ;
-                    writeln("❌ Posição ocupada no destino."),
+                    writeln("Posição ocupada no destino."),
                     jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
                     NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
 			))

@@ -4,7 +4,7 @@
 :- dynamic jogador2_nome/1.
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
-:- use_module('./src/Jogo/Movimento.pl').
+:- use_module('./src/Jogo/Movimento.pl'). 
 :- use_module('./src/Jogo/ControllerPlantas.pl').
 :- use_module('./src/Interface/Jogador.pl').
 :- use_module('./src/Utils/Ranking.pl').
