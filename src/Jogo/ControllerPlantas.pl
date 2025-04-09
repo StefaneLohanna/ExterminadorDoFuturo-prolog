@@ -33,8 +33,8 @@ plantarSemente(TPassado, TPresente, TFuturo, Tempo, Linha, Coluna, NovoTPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
     ; Tempo == 'presente' ->
-        plantar(TPresente, Arbusto, NovaLinha, NovaColuna, true, TempPresente, SucessoP),
-        plantar(TFuturo, Arvore, NovaLinha, NovaColuna, SucessoP, TempFuturo, _),
+        plantar(TPresente, Semente, NovaLinha, NovaColuna, true, TempPresente, SucessoP),
+        plantar(TFuturo, Arbusto, NovaLinha, NovaColuna, SucessoP, TempFuturo, _),
         NovoTPassado = TPassado,
         NovoTPresente = TempPresente,
         NovoTFuturo = TempFuturo
@@ -83,14 +83,14 @@ removerSemente(TPassado, TPresente, TFuturo, Tempo, Linha, Coluna, NovoTPassado,
         NovoTFuturo = TabuleiroFuturoAtualizado
 
     ; Tempo == 'presente' ->
-        removerPlanta(TPresente, Arbusto, Linha, Coluna, TabuleiroPresenteAtualizado),
-        removerPlanta(TFuturo, Arvore, Linha, Coluna, TabuleiroFuturoAtualizado),
+        removerPlanta(TPresente, Semente, Linha, Coluna, TabuleiroPresenteAtualizado),
+        removerPlanta(TFuturo, Arbusto, Linha, Coluna, TabuleiroFuturoAtualizado),
 
         NovoTPassado = TPassado,
         NovoTPresente = TabuleiroPresenteAtualizado,
         NovoTFuturo = TabuleiroFuturoAtualizado
     ; Tempo == 'futuro' ->
-        removerPlanta(TFuturo, Arvore, Linha, Coluna, TabuleiroFuturoAtualizado),
+        removerPlanta(TFuturo, Semente, Linha, Coluna, TabuleiroFuturoAtualizado),
         NovoTPassado = TPassado,
         NovoTPresente = TPresente,
         NovoTFuturo = TabuleiroFuturoAtualizado
