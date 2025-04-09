@@ -1,0 +1,42 @@
+═════════════════════════════════════════════════════════════════════════════════════════════
+DETALHAMENTO
+═════════════════════════════════════════════════════════════════════════════════════════════
+Existem três tipos de jogadas possíveis:
+    
+    1. Movimentar-se no tabuleiro (m):
+        - A peça move-se uma casa para a direita, esquerda, cima ou baixo (movimentos 
+        diagonais não são permitidos).
+        - Se houver outras peças adjacentes ao destino, elas serão empurradas, exceto 
+        quando ambas forem do mesmo jogador. Nesse caso, ocorre a eliminação de uma das 
+        peças.
+    
+    2. Viajar no tempo (v):
+        - Não é permitido viajar diretamente do passado para o futuro ou vice-versa — 
+        apenas para períodos adjacentes.
+        - O jogador seleciona uma peça existente no tabuleiro e ela é movida para o tempo 
+        escolhido.
+        - Ao viajar do futuro para o presente ou do presente para o passado, um clone é 
+        deixado para trás.
+        - Cada jogador pode ter no máximo 4 clones. Caso o limite seja 
+        atingido, viagens para tempos anteriores tornam-se impossíveis, mesmo que clones 
+        anteriores já tenham sido eliminados.
+        - Após uma viagem no tempo, o foco do jogador muda automaticamente para o tabuleiro 
+        de destino.
+    
+    3. Plantar uma semente (p):
+        Plantar uma semente gera vegetação ao longo do tempo:
+        - No passado: vira um arbusto no presente e uma árvore no futuro.
+        - No presente: vira um arbusto no futuro.
+        - No futuro: não tem efeito nos outros tempos.
+        - **Restrição:** só é permitido plantar uma semente em uma casa adjacente à peça do 
+        jogador (direita, esquerda, cima ou baixo — sem diagonais).
+        Uma semente pode ser removida ao mover uma peça para a casa onde ela está plantada, 
+        eliminando também o arbusto e a árvore relacionados.
+    
+    4. Eliminação do Oponente
+        Há três formas de eliminar o oponente:
+        - Com Árvores e Arbustos: empurrar o oponente sobre um arbusto ou empurrar uma árvore
+        sobre ele.
+        - Contra a Parede: empurrar o oponente contra a borda do tabuleiro.
+        - Por Paradoxo: quando duas peças adversárias estão lado a lado, é possível empurrá-las
+        para que colidam, criando um paradoxo e eliminando ambas.

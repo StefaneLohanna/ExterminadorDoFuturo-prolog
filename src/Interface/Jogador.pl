@@ -1,6 +1,8 @@
-:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4]).
+:- module(jogador, [definirFoco/6, focoValido/5, obterLinha/1, obterColuna/1, escolherJogada/1, obtemCoordenadasValidas/4, obtemCoordenadasOrigemValidas/4, escolherTempo/1, stringParaFoco/2, removerEspacos/2,escolherJogada/1,escolherOpcaoMenu/1,exibirOpcaoMenu/1, escolherModoDeJogo/1, exibirHistoria/0, exibirDelimitadorFinal/0,exibirDelimitadorInicial/0, exibirFimDeJogo/0, escolherMovimento/4, exibirFoco/1]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
+:- use_module('./src/Utils/ImprimirTxt.pl').
+:- use_module('./src/Utils/Ranking.pl').
 
 /*
  * Define o foco do jogador para a próxima rodada.
@@ -14,7 +16,10 @@
  */
 definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
     exibirMenuFoco,
-    read(Escolha),
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(Escolha, EntradaSemEspaco),
     (   traduzirEscolha(Escolha, FocoTentativa) ->
         (   focoValido(FocoTentativa, Jogador, Passado, Presente, Futuro) ->
             NovoFoco = FocoTentativa,
@@ -26,15 +31,6 @@ definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
     ;   definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
     ).
 
-/*
- * Exibe o menu de escolha de foco para o jogador.
- */
-exibirMenuFoco :-
-    writeln('Escolha o foco para suas próximas jogadas:'),
-    writeln('(s) Passado'),
-    writeln('(p) Presente'),
-    writeln('(f) Futuro'),
-    write('Digite sua escolha: ').
 
 /*
  * Traduz a escolha do jogador para o respectivo foco.
@@ -46,7 +42,9 @@ traduzirEscolha('s', passado).
 traduzirEscolha('p', presente).
 traduzirEscolha('f', futuro).
 traduzirEscolha(_, _) :- 
-    writeln('Opção inválida! Use s, p ou f.'),
+    negado(Negado),
+    format("~w Opção inválida! Use s, p ou f.~n", [Negado]),
+    %writeln('Opção inválida! Use s, p ou f.'),
     fail.
 
 /*
@@ -76,19 +74,140 @@ focoValido(futuro, Jogador, _, _, Futuro) :-
  *                  'r' para reiniciar o jogo.
  */
 escolherJogada(Escolha) :-
-    writeln("Escolha uma ação:"),
-    writeln("(m) Movimentar"),
-    writeln("(p) Plantar"),
-    writeln("(v) Viajar no tempo"),
-    writeln("(r) Reiniciar jogo"),
-    write("Digite sua escolha: "),
-    read(E),
+    exibirMenuJogadas,
+    negado(Negado),
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(EscolhaConvertida, EntradaSemEspaco),
     (
-        member(E, [m, p, v, r]) ->
-            Escolha = E
+        member(EscolhaConvertida, [m, p, v, r]) ->
+            Escolha = EscolhaConvertida
         ;
-            writeln("Entrada inválida! Tente novamente."),
+            format("~w Entrada inválida! Tente novamente.~n", [Negado]),
+            %writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
+    ).
+
+
+exibirFoco(Foco) :-
+    (Foco == passado ->
+        exibirFocoPassado
+    ; Foco == presente ->
+        exibirFocoPresente
+    ; Foco == futuro ->
+        exibirFocoFuturo
+    ; true
+    ).
+
+exibirFocoPassado :-
+    imprimirTxt('src/Interface/textosDeExibicao/passado.txt').
+
+exibirFocoPresente :-
+    imprimirTxt('src/Interface/textosDeExibicao/presente.txt').
+
+exibirFocoFuturo :-
+    imprimirTxt('src/Interface/textosDeExibicao/futuro.txt').
+
+/*
+ * Exibe o contexto do jogo.
+ */
+exibirHistoria :-
+    imprimirTxt('src/Interface/textosDeExibicao/exterminadorDoFuturo.txt').
+
+/*
+ * Exibe o menu de jogadas que um jogador pode realizar.
+ */
+exibirMenuJogadas :-
+    imprimirTxt('src/Interface/menus/jogadas.txt').
+
+/*
+ * Exibe o menu de escolha de foco para o jogador.
+ */
+exibirMenuFoco :-
+    imprimirTxt('src/Interface/menus/foco.txt').
+
+/*
+ * Exibe o menu de modos de jogar.
+ */
+exibirModoJogo :-
+    imprimirTxt('src/Interface/textosDeExibicao/modoDeJogo.txt').
+
+/*
+ * Exibe o menu do detalhamento de jogo.
+ */
+exibirDetalhamento :-
+    imprimirTxt('src/Interface/textosDeExibicao/detalhamentoJogo.txt').
+
+/*
+ * Exibe o menu do jogo.
+ */
+exibirMenu :-
+    imprimirTxt('src/Interface/menus/menu.txt').
+
+/*
+ * Exibe o menu de movimentos.
+ */
+exibirMenuMovimentos :-
+    imprimirTxt('src/Interface/menus/movimento.txt').
+
+/*
+ * Exibe o delimitador final.
+ */
+exibirDelimitadorFinal :-
+ imprimirTxt('src/Interface/textosDeExibicao/delimitadorFinal.txt').
+
+/*
+ * Exibe o delimitador inicial.
+ */
+exibirDelimitadorInicial :-
+ imprimirTxt('src/Interface/textosDeExibicao/delimitadorInicial.txt').
+
+/*
+ * Exibe o texto de fim de jogo.
+ */
+exibirFimDeJogo :-
+ imprimirTxt('src/Interface/textosDeExibicao/fimDeJogo.txt').
+
+/*
+ * Exibe o menu de viagem no tempo.
+ */
+exibirMenuViagem :-
+    imprimirTxt('src/Interface/menus/viagem.txt').
+
+escolherOpcaoMenu(EscolhaFinal) :-
+    exibirMenu,
+    negado(Negado),
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(Escolha, EntradaSemEspaco),
+    (
+        member(Escolha, [d, s, m, j, r]) ->
+            EscolhaFinal = Escolha 
+        ;
+        format("~w Entrada inválida!~n", [Negado]),
+        escolherOpcaoMenu(EscolhaFinal)
+    ).
+
+exibirOpcaoMenu(Opcao) :-
+    ( 
+        Opcao == r ->
+        mostrarRanking
+    ;   
+
+        Opcao == d ->
+        exibirDetalhamento
+    ;
+        Opcao == m ->
+        exibirModoJogo
+    ;
+        Opcao == j ->
+        true
+    ;
+        Opcao == s ->
+        true
+    
     ).
 
 /*
@@ -110,28 +229,34 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
         obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna)
     ).
 
-/*
- * Obtém coordenadas do jogador.
- *
- * @return Linha  A linha inserida pelo jogador.
- * @return Coluna A coluna inserida pelo jogador.
- */
-/*obtemCoordenadas(Linha, Coluna) :-
-    obterLinha(Linha),
-    obterColuna(Coluna).*/
 
 /*
  * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
  *
  * @return Linha  A linha escolhida (de 1 a 4).
  */
+% obterLinha(Linha) :-
+%     write("Informe a linha (1-4): "), read(L),
+%     ( integer(L), L >= 1, L =< 4 ->
+%         Linha = L
+%     ;
+%         %writeln("Linha inválida! Escolha um valor entre 1 e 4."),
+%         obterLinha(Linha) % Repete até obter um valor válido
+%     ).
+
 obterLinha(Linha) :-
-    write("Informe a linha (1-4): "), read(L),
-    ( integer(L), L >= 1, L =< 4 ->
-        Linha = L
+    negado(Negado),
+    write("Informe a linha (1-4): "),
+    read_line_to_codes(user_input, Codes),
+    string_codes(String, Codes),
+    normalize_space(string(EntradaSemEspaco), String),
+    ( number_string(Numero, EntradaSemEspaco),
+      integer(Numero), Numero >= 1, Numero =< 4 ->
+        Linha = Numero
     ;
-        writeln("Linha inválida! Escolha um valor entre 1 e 4."),
-        obterLinha(Linha) % Repete até obter um valor válido
+        format("~w Linha inválida! Escolha um valor entre 1 e 4.~n", [Negado]),
+         %writeln("Linha inválida! Escolha um valor entre 1 e 4."),
+        obterLinha(Linha)  % Repete até obter um valor válido
     ).
 
 /*
@@ -140,10 +265,116 @@ obterLinha(Linha) :-
  * @return Coluna  A coluna escolhida (de 1 a 4).
  */
 obterColuna(Coluna) :-
-    write("Informe a coluna (1-4): "), read(C),
-    ( integer(C), C >= 1, C =< 4 ->
-        Coluna = C
+    negado(Negado),
+    write("Informe a coluna (1-4): "),
+    read_line_to_codes(user_input, Codes),
+    string_codes(String, Codes),
+    normalize_space(string(EntradaSemEspaco), String),
+    ( number_string(Numero, EntradaSemEspaco),
+      integer(Numero), Numero >= 1, Numero =< 4 ->
+        Coluna = Numero
     ;
-        writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
-        obterColuna(Coluna) % Repete até obter um valor válido
+        format("~w Coluna inválida! Escolha um valor entre 1 e 4.~n", [Negado]),
+        %writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
+        obterColuna(Coluna)  % Repete até obter um valor válido
     ).
+
+
+escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
+    /* Pergunta ao jogador para onde deseja mover e calcula a nova posição, garantindo que esteja nos limites.
+        
+    Args:
+        Linha: linha atual da peça.
+        Coluna: coluna atual da peça.
+        NovaLinha: linha após o movimento.
+        NovaColuna: coluna após o movimento.
+
+    Returns: a nova coordenada para que o jogador se mova.
+    */
+    lerDirecaoValida(Direcao),
+    ( Direcao == w -> TempLinha is Linha - 1, TempColuna is Coluna
+    ; Direcao == a -> TempLinha is Linha,     TempColuna is Coluna - 1
+    ; Direcao == s -> TempLinha is Linha + 1, TempColuna is Coluna
+    ; Direcao == d -> TempLinha is Linha,     TempColuna is Coluna + 1
+    ),
+    ( TempLinha >= 1, TempLinha =< 4, TempColuna >= 1, TempColuna =< 4 ->
+        NovaLinha = TempLinha, NovaColuna = TempColuna
+    ;
+        negado(Negado),
+        format("~w Movimento inválido! Escolha uma direção que mantenha a peça dentro dos limites do tabuleiro.", [Negado]),
+        escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna)
+    ).
+
+lerDirecaoValida(Direcao) :-
+    negado(Negado),
+    exibirMenuMovimentos,
+    read_line_to_string(user_input, Entrada),
+    string_lower(Entrada, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(DirecaoAtom, EntradaSemEspaco),
+    ( member(DirecaoAtom, [w, a, s, d]) ->
+        Direcao = DirecaoAtom
+    ;
+        format("~w Direção inválida! Use apenas w, a, s ou d.", [Negado]),
+        lerDirecaoValida(Direcao)
+    ).
+    
+/*
+ * Obtém coordenadas de origem válidas para o jogador, ou seja,
+ * verifica se existe uma peça do jogador naquela posição.
+ *
+ * @param Tabuleiro O tabuleiro atual (passado, presente ou futuro).
+ * @param Jogador   O símbolo do jogador.
+ * @param Linha     A linha onde a peça do jogador está.
+ * @param Coluna    A coluna onde a peça do jogador está.
+ */
+obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna) :-
+    obterLinha(L),
+    obterColuna(C),
+    (
+        verificarPosicaoTabuleiro(Tabuleiro, L, C, Jogador) ->
+            Linha = L, Coluna = C
+    ;
+        format("Não há peça sua na posição (~d, ~d). Tente novamente.\n", [L, C]),
+        obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna)
+    ).
+
+escolherTempo(TempoEscolhido) :-
+    /*writeln("Escolha para qual tempo deseja viajar:"),
+    writeln("(s) passado"),
+    writeln("(p) presente"),
+    writeln("(f) futuro"),
+    read(Entrada),*/
+    exibirMenuViagem,
+    read_line_to_string(user_input, Escolha),
+    string_lower(Escolha, Lower),
+    removerEspacos(Lower, EntradaSemEspaco),
+    atom_string(Entrada, EntradaSemEspaco),
+
+    ( Entrada == s -> TempoEscolhido = "passado"
+    ; Entrada == p -> TempoEscolhido = "presente"
+    ; Entrada == f -> TempoEscolhido = "futuro"
+    ; writeln("Opção inválida, tente novamente."), escolherTempo(TempoEscolhido)
+    ).
+
+stringParaFoco("passado", passado).
+stringParaFoco("presente", presente).
+stringParaFoco("futuro", futuro).
+
+removerEspacos(Str, SemEspacos) :-
+    split_string(Str, " ", "", Lista),
+    atomic_list_concat(Lista, "", SemEspacos).
+
+escolherModoDeJogo(Escolha):-
+        imprimirTxt('src/Interface/menus/escolherModoDeJogo.txt'),
+        read_line_to_string(user_input, Entrada),
+        string_lower(Entrada, Lower),
+        removerEspacos(Lower, EntradaLimpa),
+        atom_string(EscolhaConvertida, EntradaLimpa),
+        (
+            member(EscolhaConvertida, [a, d]) ->
+                Escolha = EscolhaConvertida
+            ;
+                writeln("Entrada inválida! Tente novamente."),
+                escolherModoDeJogo(Escolha)
+        ).

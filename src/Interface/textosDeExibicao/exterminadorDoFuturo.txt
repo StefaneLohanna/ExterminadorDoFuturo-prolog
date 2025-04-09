@@ -1,0 +1,21 @@
+
+═════════════════════════════════════════════════════════════════════════════════════════════
+EXTERMINADOR DO FUTURO
+═════════════════════════════════════════════════════════════════════════════════════════════
+
+| História ----------------------------------------------------------------------------------
+| Uma máquina do tempo foi criada, mas um impostor está tentando levar o crédito pela       |
+| invenção desse artefato revolucionário. Agora, dois rivais lutam para eliminar um ao      |
+| outro e garantir que serão reconhecidos como o verdadeiro criador da máquina do tempo.    |
+---------------------------------------------------------------------------------------------
+
+| Descrição ---------------------------------------------------------------------------------
+| O jogo se desenrola em três tabuleiros 4x4, cada um representando um período temporal     |
+| distinto: passado, presente e futuro. No início, cada tabuleiro contém uma peça branca    |
+| em uma extremidade e uma peça preta na outra.                                             |
+---------------------------------------------------------------------------------------------
+
+| Objetivo ----------------------------------------------------------------------------------
+| O objetivo é eliminar o oponente até que ele tenha peças restantes em apenas um dos       |
+| tabuleiros.                                                                               |
+---------------------------------------------------------------------------------------------

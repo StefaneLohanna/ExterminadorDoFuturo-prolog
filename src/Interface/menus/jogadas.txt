@@ -1,0 +1,16 @@
+
+═════════════════════════════════════════════════════════════════════════════════════════════
+JOGADAS DISPONÍVEIS  
+═════════════════════════════════════════════════════════════════════════════════════════════
+
+[M] Mover Peça      
+      - Ande uma casa no tabuleiro (sem diagonais).
+
+[P] Plantar Semente  
+      - Plante uma semente no tabuleiro.
+
+[V] Viajar no Tempo  
+      - Mude para outro espaço temporal.
+
+═════════════════════════════════════════════════════════════════════════════════════════════
+Escolha uma opção digitando a letra correspondente: 

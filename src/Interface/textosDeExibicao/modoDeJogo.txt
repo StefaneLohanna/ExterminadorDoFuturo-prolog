@@ -1,0 +1,9 @@
+═════════════════════════════════════════════════════════════════════════════════════════════
+MODOS DE JOGO
+═════════════════════════════════════════════════════════════════════════════════════════════
+Modos de Jogo
+    - Solo: jogar contra um bot.
+    - Multijogador: dois jogadores humanos competem.
+    
+    O jogo é controlado pelo terminal, onde as opções de jogada são exibidas, permitindo que os
+    jogadores escolham suas ações e executem suas estratégias em cada rodada.
