@@ -89,64 +89,71 @@ escolherJogada(Escolha) :-
             escolherJogada(Escolha)
     ).
 
-
-exibirHistoria :-
 /*
  * Exibe o contexto do jogo.
  */
+exibirHistoria :-
     imprimirTxt('src/Interface/textosDeExibicao/exterminadorDoFuturo.txt').
 
-
-
-exibirMenuJogadas :-
 /*
  * Exibe o menu de jogadas que um jogador pode realizar.
  */
+exibirMenuJogadas :-
     imprimirTxt('src/Interface/menus/jogadas.txt').
 
-
-exibirMenuFoco :-
 /*
  * Exibe o menu de escolha de foco para o jogador.
  */
+exibirMenuFoco :-
     imprimirTxt('src/Interface/menus/foco.txt').
 
-exibirModoJogo :-
 /*
  * Exibe o menu de modos de jogar.
  */
+exibirModoJogo :-
     imprimirTxt('src/Interface/textosDeExibicao/modoDeJogo.txt').
 
-exibirDetalhamento :-
 /*
  * Exibe o menu do detalhamento de jogo.
  */
+exibirDetalhamento :-
     imprimirTxt('src/Interface/textosDeExibicao/detalhamentoJogo.txt').
 
-exibirMenu :-
 /*
  * Exibe o menu do jogo.
  */
+exibirMenu :-
     imprimirTxt('src/Interface/menus/menu.txt').
 
-exibirDelimitadorFinal :-
+/*
+ * Exibe o menu de movimentos.
+ */
+exibirMenuMovimentos :-
+    imprimirTxt('src/Interface/menus/movimento.txt').
+
 /*
  * Exibe o delimitador final.
  */
+exibirDelimitadorFinal :-
  imprimirTxt('src/Interface/textosDeExibicao/delimitadorFinal.txt').
 
-exibirDelimitadorInicial :-
 /*
  * Exibe o delimitador inicial.
  */
+exibirDelimitadorInicial :-
  imprimirTxt('src/Interface/textosDeExibicao/delimitadorInicial.txt').
 
-exibirFimDeJogo :-
 /*
  * Exibe o texto de fim de jogo.
  */
+exibirFimDeJogo :-
  imprimirTxt('src/Interface/textosDeExibicao/fimDeJogo.txt').
 
+/*
+ * Exibe o menu de viagem no tempo.
+ */
+exibirMenuViagem :-
+    imprimirTxt('src/Interface/menus/viagem.txt').
 
 escolherOpcaoMenu(EscolhaFinal) :-
     exibirMenu,
@@ -162,7 +169,6 @@ escolherOpcaoMenu(EscolhaFinal) :-
         format("~w Entrada inválida!~n", [Negado]),
         escolherOpcaoMenu(EscolhaFinal)
     ).
-
 
 exibirOpcaoMenu(Opcao) :-
     ( 
@@ -204,17 +210,6 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
     ).
 
 /*
- * Obtém coordenadas do jogador.
- *
- * @return Linha  A linha inserida pelo jogador.
- * @return Coluna A coluna inserida pelo jogador.
- */
-/*obtemCoordenadas(Linha, Coluna) :-
-    obterLinha(Linha),
-    obterColuna(Coluna).*/
-
-
-/*
  * Solicita ao jogador uma linha válida dentro dos limites do tabuleiro.
  *
  * @return Linha  A linha escolhida (de 1 a 4).
@@ -228,7 +223,6 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
 %         obterLinha(Linha) % Repete até obter um valor válido
 %     ).
 
- 
 obterLinha(Linha) :-
     negado(Negado),
     write("Informe a linha (1-4): "),
@@ -243,8 +237,6 @@ obterLinha(Linha) :-
          %writeln("Linha inválida! Escolha um valor entre 1 e 4."),
         obterLinha(Linha)  % Repete até obter um valor válido
     ).
-
-
 
 /*
  * Solicita ao jogador uma coluna válida dentro dos limites do tabuleiro.
@@ -294,7 +286,7 @@ escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna) :-
 
 lerDirecaoValida(Direcao) :-
     negado(Negado),
-    writeln("Para onde deseja mover? (w = cima, a = esquerda, s = baixo, d = direita):"),
+    exibirMenuMovimentos,
     read_line_to_string(user_input, Entrada),
     string_lower(Entrada, Lower),
     removerEspacos(Lower, EntradaSemEspaco),
@@ -325,10 +317,6 @@ obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna) :-
         format("Não há peça sua na posição (~d, ~d). Tente novamente.\n", [L, C]),
         obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna)
     ).
-
-
-exibirMenuViagem :-
-    imprimirTxt('src/Interface/menus/viagem.txt').
 
 escolherTempo(TempoEscolhido) :-
     /*writeln("Escolha para qual tempo deseja viajar:"),

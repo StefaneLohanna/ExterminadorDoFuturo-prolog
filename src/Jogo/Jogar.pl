@@ -1,4 +1,4 @@
-:- module(jogar, [inicio/0]).
+:- module(jogar, [inicio/0, nomeDoJogador/2]).
 
 :- dynamic jogador1_nome/1. 
 :- dynamic jogador2_nome/1.
@@ -134,30 +134,35 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     ),
 
     % Verifica vitória após a primeira jogada
-    (verificarVitoria(NovoPassado1, NovoPresente1, NovoFuturo1, Peca) ->
+    (verificarVitoria(J1, J2, NovoPassado1, NovoPresente1, NovoFuturo1, Vencedor1),
+    Vencedor1 \= nenhum -> 
         exibirTabuleiros(NovoPassado1, NovoPresente1, NovoFuturo1),
-        finalizarJogo(Nome)
+        finalizarJogo(Vencedor1)
     ;
         true
     ),
 
     % Segunda jogada
-    (Modo == 'a', Nome == 'bot' -> jogarBot(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
+    (Modo == 'a', Nome == 'bot' ->
+        jogarBot(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1,
+                 NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
     ;
-    jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1, NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
+        jogar(NovoFoco1, Peca, NovoClone1, NovoPassado1, NovoPresente1, NovoFuturo1,
+              NovoPassado2, NovoPresente2, NovoFuturo2, NovoClone2, _)
     ),
 
     % Verifica vitória após a segunda jogada
-    (verificarVitoria(NovoPassado2, NovoPresente2, NovoFuturo2, Peca) ->
+    (verificarVitoria(J1, J2, NovoPassado2, NovoPresente2, NovoFuturo2, Vencedor2),
+    Vencedor2 \= nenhum -> 
         exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
-        finalizarJogo(Nome)
+        finalizarJogo(Vencedor2)
     ;
         true
     ),
     
     exibirDelimitadorInicial,
     exibirTabuleiros(NovoPassado2, NovoPresente2, NovoFuturo2),
-    exibirDelimitadorFinal,
+    % exibirDelimitadorFinal,
 
     % Define o foco para a próxima rodada
     (Modo == 'a' ->
@@ -272,7 +277,7 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPres
 jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco) :-
     exibirDelimitadorInicial,
     exibirTabuleiros(Passado, Presente, Futuro),
-    exibirDelimitadorFinal,
+    % exibirDelimitadorFinal,
     negado(Negado),
     escolherJogada(Escolha),
 

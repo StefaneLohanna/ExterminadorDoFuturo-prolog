@@ -1,4 +1,6 @@
-:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/4, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7, verificaPosicaoLivre/4, negado/1, exclamacao/1, caveira/1]).
+:- module(tabuleiro, [criarTabuleiro/1, exibirTabuleiros/3, iniciarTabuleiros/3, plantar/5,semente/1, arbusto/1, arvore/1, jogador1/1, jogador2/1, verificarPosicaoTabuleiro/4, moverPeca/7, existeJogador/2, removerPlanta/5, verificarVitoria/6, viagemNoTabuleiro/7, viagemNoTabuleiroClones/7, verificaPosicaoLivre/4, negado/1, exclamacao/1, caveira/1]).
+
+:- use_module('./src/Jogo/Jogar.pl').
 
 %  Definindo os emojis dos jogadores
 espacoVazio('\x1F533'). 
@@ -525,23 +527,25 @@ substituirEmLista([H|T], Index, Elem, [H|Resto]) :-
     Index1 is Index - 1,
     substituirEmLista(T, Index1, Elem, Resto).
 
-% Verifica se o jogador atual venceu o jogo
-verificarVitoria(Passado, Presente, Futuro, JogadorAtual) :-
-    % Determina o adversário
-    jogador1(Jogador1),
-    jogador2(Jogador2),
-    (JogadorAtual = Jogador1 -> Adversario = Jogador2 ; Adversario = Jogador1),
-    
-    % Verifica em quais tabuleiros o adversário está presente
-    (existeJogador(Passado, Adversario) -> PresenteNoPassado = 1 ; PresenteNoPassado = 0),
-    (existeJogador(Presente, Adversario) -> PresenteNoPresente = 1 ; PresenteNoPresente = 0),
-    (existeJogador(Futuro, Adversario) -> PresenteNoFuturo = 1 ; PresenteNoFuturo = 0),
+verificarVitoria(Jogador1, Jogador2, Passado, Presente, Futuro, VencedorNome) :-
+    contaTabuleirosComJogador([Passado, Presente, Futuro], Jogador1, Conta1),
+    contaTabuleirosComJogador([Passado, Presente, Futuro], Jogador2, Conta2),
+    (
+        Conta1 =:= 1 ->
+            nomeDoJogador(Jogador1, VencedorNome)
+    ;
+        Conta2 =:= 1 ->
+            nomeDoJogador(Jogador2, VencedorNome)
+    ;
+        VencedorNome = nenhum
+    ).
 
-    % Soma o total de tabuleiros onde o adversário está presente
-    Soma is PresenteNoPassado + PresenteNoPresente + PresenteNoFuturo,
+contaTabuleirosComJogador(Tabuleiros, Jogador, Conta) :-
+    include(temJogador(Jogador), Tabuleiros, Filtrados),
+    length(Filtrados, Conta).
 
-    % Se o adversário está em apenas um tabuleiro, o jogador atual vence
-    Soma =:= 1.
+temJogador(Jogador, Tabuleiro) :-
+    existeJogador(Tabuleiro, Jogador).
 
 verificaPosicaoLivre(Tabuleiro, Linha, Coluna, true) :-
     espacoVazio(Ev),
