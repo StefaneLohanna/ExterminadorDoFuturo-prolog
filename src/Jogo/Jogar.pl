@@ -118,8 +118,10 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
     ;
         (FocoAtual = FocoJ2, CloneAtual = ClonesJ2)
     ),
-            
-    verificarOuDefinirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco),
+
+    (Modo == 'a', Nome == 'bot' -> verificarOuDefinirFocoBot(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)
+    ;
+    verificarOuDefinirFoco(Peca, Passado, Presente, Futuro, FocoAtual, NovoFoco)),
 
     % Primeira jogada
     (Modo == 'a', Nome == 'bot' -> jogarBot(NovoFoco, Peca, CloneAtual, Passado, Presente, Futuro, NovoPassado1, NovoPresente1, NovoFuturo1, NovoClone1, NovoFoco1)
@@ -137,7 +139,11 @@ rodada(Peca, _, FocoJ1, FocoJ2, ClonesJ1, ClonesJ2, Passado, Presente, Futuro, M
         true
     ),
 
-    verificarOuDefinirFoco(Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoFoco1, NovoFoco2),
+    (Modo == 'a', Nome == 'bot' ->
+        verificarOuDefinirFocoBot(Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoFoco1, NovoFoco2)
+        ;
+        verificarOuDefinirFoco(Peca, NovoPassado1, NovoPresente1, NovoFuturo1, NovoFoco1, NovoFoco2)
+    ),
 
     % Segunda jogada
     (Modo == 'a', Nome == 'bot' ->
@@ -219,6 +225,14 @@ verificarOuDefinirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) 
     ;
         writeln('Jogador não está presente nesse foco. Escolha outro foco.'),
         definirFoco(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco)
+    ).
+
+verificarOuDefinirFocoBot(Jogador, Passado, Presente, Futuro, FocoAtual, NovoFoco) :-
+    ( focoValido(FocoAtual, Jogador, Passado, Presente, Futuro) ->
+        NovoFoco = FocoAtual
+    ;
+        writeln('Jogador não está presente nesse foco. Escolha outro foco.'),
+        escolherTempoBot(FocoAtual, NovoFoco)
     ).
 
 jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
