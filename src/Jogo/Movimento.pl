@@ -6,16 +6,20 @@
 
 
 movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, PecaEsperada, NovoPassado, NovoPresente, NovoFuturo) :-
-    /* Efetua o movimento do jogador. 
-
-    Args: 
-        Foco: foco atual do jogador. 
-        Passado: tabuleiro atual que representa o passado. 
-        Presente: tabuleiro atual que representa o presente. 
-        Futuro: tabuleiro atual que representa o futuro. 
-        PecaEsperada: Peca do jogador. 
-        TabuleiroAtualizado: Novo tabuleiro que foi modificado. 
-    */
+    /* Efetua o movimento do jogador com as coordenadas já escolhidas, verificando e removendo sementes se necessário
+ 
+  * @param Tabuleiro Tabuleiro antes do movimento.
+  * @param Passado Tabuleiro do passado.
+  * @param Presente Tabuleiro do presente.
+  * @param Futuro Tabuleiro do futuro.
+  * @param Foco Tempo atual do jogador (passado, presente ou futuro).
+  * @param Linha Linha atual da peça a ser movida.
+  * @param Coluna Coluna atual da peça a ser movida.
+  * @param PecaEsperada Peça esperada na posição de destino para validação do movimento.
+  * @param NovoPassado Tabuleiro do passado atualizado após o movimento.
+  * @param NovoPresente Tabuleiro do presente atualizado após o movimento.
+  * @param NovoFuturo Tabuleiro do futuro atualizado após o movimento.
+  */
     
     escolherMovimento(Linha, Coluna, NovaLinha, NovaColuna),
     semente(Semente),
@@ -39,16 +43,22 @@ movimento(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, PecaEsperad
     ).
 
 movimentoBot(Tabuleiro, Passado, Presente, Futuro, Foco, Linha, Coluna, NovaLinha, NovaColuna, PecaEsperada, NovoPassado, NovoPresente, NovoFuturo) :-
-    /* Efetua o movimento do jogador. 
-
-    Args: 
-        Foco: foco atual do jogador. 
-        Passado: tabuleiro atual que representa o passado. 
-        Presente: tabuleiro atual que representa o presente. 
-        Futuro: tabuleiro atual que representa o futuro. 
-        PecaEsperada: Peca do jogador. 
-        TabuleiroAtualizado: Novo tabuleiro que foi modificado. 
-    */
+    /* Efetua o movimento do jogador com as coordenadas já escolhidas, verificando e removendo sementes se necessário
+ 
+  * @param Tabuleiro Tabuleiro antes do movimento.
+  * @param Passado Tabuleiro do passado.
+  * @param Presente Tabuleiro do presente.
+  * @param Futuro Tabuleiro do futuro.
+  * @param Foco Tempo atual do bot (passado, presente ou futuro).
+  * @param Linha Linha atual da peça a ser movida.
+  * @param Coluna Coluna atual da peça a ser movida.
+  * @param NovaLinha Linha de destino do movimento.
+  * @param NovaColuna Coluna de destino do movimento.
+  * @param PecaEsperada Peça esperada na posição de destino para validação do movimento.
+  * @param NovoPassado Tabuleiro do passado atualizado após o movimento.
+  * @param NovoPresente Tabuleiro do presente atualizado após o movimento.
+  * @param NovoFuturo Tabuleiro do futuro atualizado após o movimento.
+  */
 
     semente(Semente),
     nth1(NovaLinha, Tabuleiro, LinhaDestinoLista),

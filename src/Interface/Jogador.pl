@@ -44,7 +44,6 @@ traduzirEscolha('f', futuro).
 traduzirEscolha(_, _) :- 
     negado(Negado),
     format("~w Opção inválida! Use s, p ou f.~n", [Negado]),
-    %writeln('Opção inválida! Use s, p ou f.'),
     fail.
 
 /*
@@ -85,7 +84,6 @@ escolherJogada(Escolha) :-
             Escolha = EscolhaConvertida
         ;
             format("~w Entrada inválida! Tente novamente.~n", [Negado]),
-            %writeln("Entrada inválida! Tente novamente."),
             escolherJogada(Escolha)
     ).
 
@@ -235,14 +233,6 @@ obtemCoordenadasValidas(Tabuleiro, Jogador, Linha, Coluna) :-
  *
  * @return Linha  A linha escolhida (de 1 a 4).
  */
-% obterLinha(Linha) :-
-%     write("Informe a linha (1-4): "), read(L),
-%     ( integer(L), L >= 1, L =< 4 ->
-%         Linha = L
-%     ;
-%         %writeln("Linha inválida! Escolha um valor entre 1 e 4."),
-%         obterLinha(Linha) % Repete até obter um valor válido
-%     ).
 
 obterLinha(Linha) :-
     negado(Negado),
@@ -255,7 +245,6 @@ obterLinha(Linha) :-
         Linha = Numero
     ;
         format("~w Linha inválida! Escolha um valor entre 1 e 4.~n", [Negado]),
-         %writeln("Linha inválida! Escolha um valor entre 1 e 4."),
         obterLinha(Linha)  % Repete até obter um valor válido
     ).
 
@@ -267,7 +256,7 @@ obterLinha(Linha) :-
 obterColuna(Coluna) :-
     negado(Negado),
     write("Informe a coluna (1-4): "),
-    read_line_to_codes(user_input, Codes),
+    read_line_to_codes(user_input, Codes), 
     string_codes(String, Codes),
     normalize_space(string(EntradaSemEspaco), String),
     ( number_string(Numero, EntradaSemEspaco),
@@ -275,7 +264,6 @@ obterColuna(Coluna) :-
         Coluna = Numero
     ;
         format("~w Coluna inválida! Escolha um valor entre 1 e 4.~n", [Negado]),
-        %writeln("Coluna inválida! Escolha um valor entre 1 e 4."),
         obterColuna(Coluna)  % Repete até obter um valor válido
     ).
 
@@ -340,11 +328,6 @@ obtemCoordenadasOrigemValidas(Tabuleiro, Jogador, Linha, Coluna) :-
     ).
 
 escolherTempo(TempoEscolhido) :-
-    /*writeln("Escolha para qual tempo deseja viajar:"),
-    writeln("(s) passado"),
-    writeln("(p) presente"),
-    writeln("(f) futuro"),
-    read(Entrada),*/
     exibirMenuViagem,
     read_line_to_string(user_input, Escolha),
     string_lower(Escolha, Lower),

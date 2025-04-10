@@ -305,7 +305,6 @@ empurrar(TabuleiroAntigo, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino
         )
     ;
     format("~w Jogador morreu!~n", [Caveira]),
-        %writeln("Jogador morreu!"),
         removerPeca(TabuleiroAntigo, LinhaDestino, ColunaDestino, TabuleiroIntermediario),
         moverSimples(TabuleiroIntermediario, LinhaOrigem, ColunaOrigem, LinhaDestino, ColunaDestino, Jogador, TabuleiroAtualizado)
     ).
@@ -541,20 +540,6 @@ substituirEmLista([H|T], Index, Elem, [H|Resto]) :-
     Index > 0,
     Index1 is Index - 1,
     substituirEmLista(T, Index1, Elem, Resto).
-
-/*verificarVitoria(Jogador1, Jogador2, Passado, Presente, Futuro, VencedorNome) :-
-    contaTabuleirosComJogador([Passado, Presente, Futuro], Jogador1, Conta1),
-    contaTabuleirosComJogador([Passado, Presente, Futuro], Jogador2, Conta2),
-    (
-        Conta1 =:= 1 ->
-            nomeDoJogador(Jogador1, VencedorNome)
-    ;
-        Conta2 =:= 1 ->
-            nomeDoJogador(Jogador2, VencedorNome)
-    ;
-        VencedorNome = nenhum
-    ).
-    ).*/
 
 
 verificarVitoria(J1, J2, Passado, Presente, Futuro, VencedorNome) :-

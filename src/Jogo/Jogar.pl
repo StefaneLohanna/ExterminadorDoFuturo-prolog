@@ -11,9 +11,9 @@
 :- use_module('./src/Jogo/ViagemNoTempo.pl').
 :- use_module('./src/Utils/Bot.pl').
 
-:- use_module(library(readutil)). % para ler linha completa com read_line_to_string
-:- use_module(library(apply)).   % 
-:- use_module(library(strings)). % para string_lower (se necessário)
+:- use_module(library(readutil)). 
+:- use_module(library(apply)).   
+:- use_module(library(strings)).
 :- use_module(library(system)).
 
 inicio :-
@@ -261,8 +261,6 @@ jogarBot(Foco, Jogador, Clones, Passado, Presente, Futuro,
         viagemBot(Foco, Clones, Linha, Coluna, Jogador,
                   Passado, Presente, Futuro,
                   NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
-        %writeln("saiu em viagem")
-
 
     ; Escolha == 'r' ->
         writeln("Reiniciando o jogo..."),
@@ -308,7 +306,6 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
     (
         Resultado == "viagem impossível" ->
             format("~w Viagem impossível. Tente outra jogada.~n", [Negado]),
-            %writeln("Viagem impossível. Tente outra jogada."),
             jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
                     NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
 
@@ -327,7 +324,6 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
                     stringParaFoco(TempoEscolhido, NovoFoco)
                 ;
                     format("~w A posição no tempo de destino já está ocupada. Tente outra jogada.~n", [Negado]),
-                    %writeln("A posição no tempo de destino já está ocupada. Tente outra jogada."),
                     jogar(Foco, Jogador, Clones, Passado, Presente, Futuro,
                         NovoPassado, NovoPresente, NovoFuturo, NovoClones, NovoFoco)
 
@@ -340,7 +336,6 @@ jogar(Foco, Jogador, Clones, Passado, Presente, Futuro, NovoPassado, NovoPresent
         iniciarJogo
     ; % fallback
         format("~w Escolha inválida inesperada!~n", [Negado]),
-        %writeln("Escolha inválida inesperada!"),
         NovoPassado = Passado, NovoPresente = Presente, NovoFuturo = Futuro
     ).
 

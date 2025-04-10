@@ -1,16 +1,7 @@
 :- module(viagemNoTempo, [defineViagem/4, viagem/13, viagemBot/13]).
 
 :- use_module('./src/Jogo/Tabuleiro.pl').
-:- use_module('./src/Jogo/ControllerPlantas.pl').
 :- use_module('./src/Interface/Jogador.pl').
-
-
-
-%! stringParaFoco(+TempoStr:string, -Foco:atom) is det.
-% Converte a string do tempo ("passado"/"presente"/"futuro") em átomo.
-/*stringParaFoco("passado", passado).
-stringParaFoco("presente", presente).
-stringParaFoco("futuro",  futuro). */
 
 
 viagem(FocoAtual, Clones, NovoTempoStr, Linha, Coluna, Jogador,
